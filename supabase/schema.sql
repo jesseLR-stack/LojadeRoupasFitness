@@ -82,6 +82,10 @@ $$;
 alter table public.products enable row level security;
 alter table public.orders enable row level security;
 
+revoke all on public.products, public.orders from anon, authenticated;
+grant select, insert, update, delete on public.products, public.orders to service_role;
+grant usage, select on all sequences in schema public to service_role;
+
 revoke all on function public.reserve_stock(jsonb) from public, anon, authenticated;
 revoke all on function public.sync_products_id_seq() from public, anon, authenticated;
 grant execute on function public.reserve_stock(jsonb) to service_role;
