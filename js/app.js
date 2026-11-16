@@ -1,7 +1,7 @@
 // ===== Estado =====
 const FREE_SHIPPING = 299;
 const SHIPPING_COST = 24.9;
-const COUPONS = { PULSE10: 0.1, TREINO15: 0.15 };
+const COUPONS = { NEW10: 0.1, TREINO15: 0.15 };
 
 const state = {
   category: "all",
@@ -9,8 +9,10 @@ const state = {
   collection: "all",
   sort: "featured",
   query: "",
-  cart: load("pulse-cart", []),
-  coupon: load("pulse-coupon", null),
+  cart: load("newfitness-cart", []),
+  coupon: load("newfitness-coupon", null),
+  favs: load("newfitness-favs", []),
+  onlyFavs: false,
 };
 
 function load(key, fallback) {
@@ -18,8 +20,9 @@ function load(key, fallback) {
 }
 function save() {
   try {
-    localStorage.setItem("pulse-cart", JSON.stringify(state.cart));
-    localStorage.setItem("pulse-coupon", JSON.stringify(state.coupon));
+    localStorage.setItem("newfitness-cart", JSON.stringify(state.cart));
+    localStorage.setItem("newfitness-coupon", JSON.stringify(state.coupon));
+    localStorage.setItem("newfitness-favs", JSON.stringify(state.favs));
   } catch { /* armazenamento indisponível: segue só em memória */ }
 }
 
@@ -31,7 +34,34 @@ const stars = (r) => "★".repeat(Math.round(r)) + "☆".repeat(5 - Math.round(r
 function renderChips() {
   $("#categoryChips").innerHTML = CATEGORIES.map(
     (c) => `<button class="chip ${state.category === c.id ? "active" : ""}" data-cat="${c.id}">${c.label}</button>`
-  ).join("");
+  ).join("") +
+    `<button class="chip chip-fav ${state.onlyFavs ? "active" : ""}" data-favs>♥ Favoritos (${state.favs.length})</button>`;
+}
+
+const HEART = `<svg viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z"/></svg>`;
+
+function toggleFav(id) {
+  const on = !state.favs.includes(id);
+  state.favs = on ? [...state.favs, id] : state.favs.filter((f) => f !== id);
+  save();
+  renderFavCount();
+  renderChips();
+  renderProducts();
+  toast(on ? "Salvo nos favoritos ♥" : "Removido dos favoritos");
+}
+
+function renderFavCount() {
+  $("#favCount").textContent = state.favs.length;
+  $("#favCount").classList.toggle("show", state.favs.length > 0);
+}
+
+function relatedProducts(p) {
+  return PRODUCTS
+    .filter((x) => x.id !== p.id)
+    .map((x) => ({ x, score: (x.category === p.category ? 2 : 0) + x.collections.filter((c) => p.collections.includes(c)).length }))
+    .sort((a, b) => b.score - a.score || b.x.rating - a.x.rating)
+    .slice(0, 3)
+    .map((r) => r.x);
 }
 
 function filteredProducts() {
@@ -40,7 +70,8 @@ function filteredProducts() {
     (state.category === "all" || p.category === state.category) &&
     (state.gender === "all" || p.gender === state.gender || p.gender === "unissex") &&
     (state.collection === "all" || p.collections.includes(state.collection)) &&
-    (!q || `${p.name} ${p.category} ${p.description}`.toLowerCase().includes(q))
+    (!state.onlyFavs || state.favs.includes(p.id)) &&
+    (!q ||`${p.name} ${p.category} ${p.description}`.toLowerCase().includes(q))
   );
   const sorters = {
     "price-asc": (a, b) => a.price - b.price,
@@ -57,8 +88,12 @@ function productCard(p) {
   return `
   <article class="card" data-id="${p.id}" tabindex="0">
     <div class="card-media" data-bg="${p.colors[0]}">
-      ${p.tag ? `<span class="tag">${p.tag}</span>` : ""}
-      ${discount ? `<span class="tag tag-off">-${discount}%</span>` : ""}
+      <div class="tags">
+        ${p.tag ? `<span class="tag">${p.tag}</span>` : ""}
+        ${discount ? `<span class="tag tag-off">-${discount}%</span>` : ""}
+      </div>
+      <button class="fav-btn ${state.favs.includes(p.id) ? "on" : ""}" data-fav="${p.id}"
+        aria-label="${state.favs.includes(p.id) ? "Remover dos favoritos" : "Salvar nos favoritos"}" aria-pressed="${state.favs.includes(p.id)}">${HEART}</button>
       ${productArt(p)}
       <button class="quick-add" data-quick="${p.id}">+ Adicionar rápido</button>
     </div>
@@ -76,6 +111,9 @@ function renderProducts() {
   const list = filteredProducts();
   $("#productGrid").innerHTML = list.map(productCard).join("");
   $("#emptyState").hidden = list.length > 0;
+  $("#emptyState").textContent = state.onlyFavs && !state.favs.length
+    ? "Você ainda não tem favoritos. Toque no ♥ de um produto para salvar."
+    : "Nenhum produto encontrado. Tente outro filtro.";
   $("#resultInfo").textContent = `${list.length} ${list.length === 1 ? "produto" : "produtos"}`;
 }
 
@@ -116,6 +154,16 @@ function renderModal() {
         <li>✓ Troca grátis em 30 dias</li>
         <li>✓ Envio em até 24h úteis</li>
       </ul>
+      <button class="btn btn-ghost small fav-inline ${state.favs.includes(p.id) ? "on" : ""}" data-fav-modal>
+        ${HEART} ${state.favs.includes(p.id) ? "Nos seus favoritos" : "Salvar nos favoritos"}</button>
+
+      <p class="opt-label">Combina com</p>
+      <div class="related">${relatedProducts(p).map((r) => `
+        <button class="rel" data-related="${r.id}">
+          <div class="thumb" data-bg="${r.colors[0]}">${productArt(r)}</div>
+          <span>${r.name}</span><b>${brl(r.price)}</b>
+        </button>`).join("")}
+      </div>
     </div>`;
 }
 
@@ -124,7 +172,15 @@ $("#productModal").addEventListener("click", (e) => {
   if (t === e.currentTarget || t.closest("[data-close]")) return $("#productModal").close();
   if (t.dataset.color) { modalSel.color = t.dataset.color; renderModal(); }
   if (t.dataset.size) { modalSel.size = t.dataset.size; renderModal(); }
-  if (t.closest("[data-guide]")) { e.preventDefault(); toast("PP 34‑36 · P 38 · M 40‑42 · G 44 · GG 46 · XG 48"); }
+  if (t.closest("[data-guide]")) { e.preventDefault(); $("#sizeModal").showModal(); }
+  if (t.closest("[data-fav-modal]")) { toggleFav(modalSel.id); renderModal(); }
+  const rel = t.closest("[data-related]");
+  if (rel) {
+    const p = PRODUCTS.find((x) => x.id === Number(rel.dataset.related));
+    modalSel = { id: p.id, color: p.colors[0], size: null };
+    renderModal();
+    $("#productModal").scrollTop = 0;
+  }
   if (t.closest("[data-add]")) {
     if (!modalSel.size) {
       $(".size-opts").classList.add("shake");
@@ -223,9 +279,7 @@ $("#applyCoupon").addEventListener("click", () => {
   renderCart();
 });
 
-$("#checkoutBtn").addEventListener("click", () => {
-  toast(`Pedido de ${brl(totals().total)} pronto! (o pagamento será integrado na próxima etapa)`);
-});
+$("#checkoutBtn").addEventListener("click", () => openCheckout());
 
 function openCart() {
   $("#cartDrawer").classList.add("open");
@@ -257,7 +311,26 @@ function toast(msg) {
 }
 
 // ===== Eventos da loja =====
+function showFavorites(on) {
+  state.onlyFavs = on;
+  renderChips();
+  renderProducts();
+}
+
+$("#openFavs").addEventListener("click", () => {
+  showFavorites(true);
+  $("#loja").scrollIntoView({ behavior: "smooth" });
+});
+
+$("#sizeModal").addEventListener("click", (e) => {
+  if (e.target === e.currentTarget || e.target.closest("[data-size-close]")) $("#sizeModal").close();
+});
+document.querySelectorAll("[data-open-guide]").forEach((a) =>
+  a.addEventListener("click", (e) => { e.preventDefault(); $("#sizeModal").showModal(); })
+);
+
 $("#categoryChips").addEventListener("click", (e) => {
+  if (e.target.closest("[data-favs]")) return showFavorites(!state.onlyFavs);
   if (!e.target.dataset.cat) return;
   state.category = e.target.dataset.cat;
   renderChips();
@@ -265,6 +338,8 @@ $("#categoryChips").addEventListener("click", (e) => {
 });
 
 $("#productGrid").addEventListener("click", (e) => {
+  const fav = e.target.closest("[data-fav]");
+  if (fav) return toggleFav(Number(fav.dataset.fav));
   const quick = e.target.closest("[data-quick]");
   if (quick) {
     const p = PRODUCTS.find((x) => x.id === Number(quick.dataset.quick));
@@ -309,7 +384,7 @@ document.querySelectorAll("[data-nav-gender], [data-nav-cat]").forEach((a) =>
 $("#newsletterForm").addEventListener("submit", (e) => {
   e.preventDefault();
   e.target.reset();
-  toast("Bem-vindo(a) ao time! Use o cupom PULSE10 🎁");
+  toast("Bem-vindo(a) ao time! Use o cupom NEW10 🎁");
 });
 
 // Header muda ao rolar
@@ -325,3 +400,4 @@ $("#heroCard2").dataset.bg = "lima";
 renderChips();
 renderProducts();
 renderCart();
+renderFavCount();
