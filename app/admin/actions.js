@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { SESSION_COOKIE, SESSION_HOURS, adminPassword, checkPassword, createSessionToken, verifySessionToken } from "@/lib/auth";
-import { db, missingSeedProducts, normalizeProductInput } from "@/lib/db";
+import { MAX_IMAGES, db, missingSeedProducts, normalizeProductInput } from "@/lib/db";
 import { ORDER_STATUSES } from "@/lib/orders";
 
 async function requireAdmin() {
@@ -85,4 +85,60 @@ export async function setOrderStatus(formData) {
   if (!ORDER_STATUSES[status]) return;
   await db.updateOrderStatus(String(formData.get("number")), status);
   revalidatePath("/admin");
+}
+
+// ---------- Fotos dos produtos ----------
+
+const IMAGE_TYPES = { "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp" };
+const MAX_IMAGE_BYTES = 4 * 1024 * 1024;
+
+async function productOr404(id) {
+  const product = await db.getProduct({ id: Number(id) });
+  if (!product) throw new Error("Produto não encontrado");
+  return product;
+}
+
+export async function addProductImage(formData) {
+  await requireAdmin();
+  const product = await productOr404(formData.get("id"));
+  const file = formData.get("file");
+  if (!file || typeof file === "string" || file.size === 0) return { error: "Escolha uma foto" };
+  if (!IMAGE_TYPES[file.type]) return { error: "Use uma foto JPG, PNG ou WebP" };
+  if (file.size > MAX_IMAGE_BYTES) return { error: "Foto muito grande (máximo 4 MB)" };
+  if (product.images.length >= MAX_IMAGES) return { error: `Cada produto pode ter até ${MAX_IMAGES} fotos` };
+
+  const path = `${product.id}/${Date.now()}-${crypto.randomUUID().slice(0, 8)}.${IMAGE_TYPES[file.type]}`;
+  try {
+    const url = await db.uploadImage(path, new Uint8Array(await file.arrayBuffer()), file.type);
+    const images = [...product.images, url];
+    await db.setProductImages(product.id, images);
+    refreshStore();
+    return { images };
+  } catch (e) {
+    const hint = /bucket|not found/i.test(e.message) ? " Rode o arquivo supabase/002_fotos_avaliacoes.sql no Supabase." : "";
+    return { error: `Não foi possível enviar a foto: ${e.message}.${hint}` };
+  }
+}
+
+export async function removeProductImage(formData) {
+  await requireAdmin();
+  const product = await productOr404(formData.get("id"));
+  const url = String(formData.get("url"));
+  if (!product.images.includes(url)) return { images: product.images };
+  const images = product.images.filter((u) => u !== url);
+  await db.setProductImages(product.id, images);
+  await db.deleteImage(url).catch(() => {}); // se falhar, a foto só fica sobrando no Storage
+  refreshStore();
+  return { images };
+}
+
+export async function makeMainImage(formData) {
+  await requireAdmin();
+  const product = await productOr404(formData.get("id"));
+  const url = String(formData.get("url"));
+  if (!product.images.includes(url)) return { images: product.images };
+  const images = [url, ...product.images.filter((u) => u !== url)];
+  await db.setProductImages(product.id, images);
+  refreshStore();
+  return { images };
 }

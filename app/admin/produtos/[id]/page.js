@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { db } from "@/lib/db";
+import { MAX_IMAGES, db } from "@/lib/db";
 import ProductForm from "../ProductForm";
 
 export default async function EditProductPage({ params }) {
@@ -9,7 +9,7 @@ export default async function EditProductPage({ params }) {
   return (
     <>
       <div className="admin-head"><h1>Editar produto</h1></div>
-      <ProductForm product={product} />
+      <ProductForm product={product} maxImages={MAX_IMAGES} />
     </>
   );
 }

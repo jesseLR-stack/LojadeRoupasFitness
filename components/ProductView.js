@@ -3,15 +3,18 @@
 import { useState } from "react";
 import { COLORS, categoryLabel } from "@/lib/products";
 import { PIX_DISCOUNT, brl } from "@/lib/pricing";
-import ProductArt from "./ProductArt";
+import ProductImage from "./ProductImage";
 import SizeGuide from "./SizeGuide";
 import { useStore } from "./StoreProvider";
-import { HeartIcon, stars } from "./icons";
+import Rating from "./Rating";
+import { HeartIcon } from "./icons";
 
 export default function ProductView({ product: p }) {
   const { addToCart, openCart, toast, favs, toggleFav } = useStore();
   const [color, setColor] = useState(p.colors[0]);
   const [size, setSize] = useState(null);
+  const [photo, setPhoto] = useState(0);
+  const photos = p.images ?? [];
   const [shake, setShake] = useState(false);
   const fav = favs.includes(p.id);
   const soldOut = p.stock <= 0;
@@ -27,13 +30,25 @@ export default function ProductView({ product: p }) {
 
   return (
     <div className="pdp">
-      <div className="pdp-media" data-bg={color}>
-        <ProductArt product={p} color={color} />
+      <div className="pdp-gallery">
+        <div className={`pdp-media ${photos.length ? "has-photo" : ""}`} data-bg={color}>
+          <ProductImage product={p} color={color} index={photo} priority />
+        </div>
+        {photos.length > 1 && (
+          <div className="pdp-thumbs">
+            {photos.map((src, i) => (
+              <button key={src} className={i === photo ? "active" : ""} onClick={() => setPhoto(i)} aria-label={`Ver foto ${i + 1}`} aria-pressed={i === photo}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={src} alt="" />
+              </button>
+            ))}
+          </div>
+        )}
       </div>
       <div className="pdp-info">
         <p className="eyebrow">{categoryLabel(p.category)} · {p.gender}</p>
         <h1>{p.name}</h1>
-        <p className="rating"><span>{stars(p.rating)}</span> {p.rating} · {p.reviews} avaliações</p>
+        <Rating product={p} long />
         <p className="price big">{p.oldPrice && <s>{brl(p.oldPrice)}</s>}<strong>{brl(p.price)}</strong></p>
         <p className="installments">
           6x de {brl(p.price / 6)} sem juros · {brl(p.price * (1 - PIX_DISCOUNT))} no Pix

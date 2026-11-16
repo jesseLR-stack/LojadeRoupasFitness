@@ -3,9 +3,10 @@
 import Link from "next/link";
 import { COLORS } from "@/lib/products";
 import { brl } from "@/lib/pricing";
-import ProductArt from "./ProductArt";
+import ProductImage from "./ProductImage";
 import { useStore } from "./StoreProvider";
-import { HeartIcon, stars } from "./icons";
+import Rating from "./Rating";
+import { HeartIcon } from "./icons";
 
 export default function ProductCard({ product: p }) {
   const { favs, toggleFav, addToCart } = useStore();
@@ -20,7 +21,7 @@ export default function ProductCard({ product: p }) {
 
   return (
     <article className={`card ${soldOut ? "sold-out" : ""}`}>
-      <div className="card-media" data-bg={p.colors[0]}>
+      <div className={`card-media ${p.images?.length ? "has-photo" : ""}`} data-bg={p.colors[0]}>
         <div className="tags">
           {soldOut && <span className="tag tag-out">Esgotado</span>}
           {!soldOut && p.tag && <span className="tag">{p.tag}</span>}
@@ -35,7 +36,7 @@ export default function ProductCard({ product: p }) {
           <HeartIcon />
         </button>
         <Link href={`/produto/${p.slug}`} className="card-link" aria-label={p.name}>
-          <ProductArt product={p} />
+          <ProductImage product={p} />
         </Link>
         {!soldOut && <button className="quick-add" onClick={quickAdd}>+ Adicionar rápido</button>}
       </div>
@@ -44,7 +45,7 @@ export default function ProductCard({ product: p }) {
           {p.colors.map((c) => <span key={c} style={{ background: COLORS[c].hex }} title={COLORS[c].name} />)}
         </div>
         <h3>{p.name}</h3>
-        <p className="rating"><span>{stars(p.rating)}</span> {p.rating} ({p.reviews})</p>
+        <Rating product={p} />
         <p className="price">{p.oldPrice && <s>{brl(p.oldPrice)}</s>}<strong>{brl(p.price)}</strong></p>
         <p className="installments">ou 6x de {brl(p.price / 6)}</p>
       </Link>

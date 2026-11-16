@@ -38,8 +38,11 @@ export default async function ProductPage({ params }) {
     name: product.name,
     description: product.description,
     sku: `NF-${product.id}`,
+    ...(product.images?.length && { image: product.images }),
     brand: { "@type": "Brand", name: "NewFitness" },
-    aggregateRating: { "@type": "AggregateRating", ratingValue: product.rating, reviewCount: product.reviews },
+    ...(product.reviews > 0 && {
+      aggregateRating: { "@type": "AggregateRating", ratingValue: product.rating, reviewCount: product.reviews },
+    }),
     offers: {
       "@type": "Offer",
       url: `${SITE_URL}/produto/${product.slug}`,

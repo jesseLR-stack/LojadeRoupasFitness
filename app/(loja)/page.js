@@ -29,9 +29,9 @@ export default function HomePage() {
             <Link href="#colecoes" className="btn btn-ghost">Ver coleções</Link>
           </div>
           <ul className="hero-stats">
-            <li><strong>4.9★</strong><span>+12 mil avaliações</span></li>
-            <li><strong>Dry‑Fit</strong><span>tecnologia antissuor</span></li>
-            <li><strong>UPF 50+</strong><span>proteção solar</span></li>
+            <li><strong>Frete grátis</strong><span>acima de R$ 299</span></li>
+            <li><strong>6x sem juros</strong><span>ou 5% off no Pix</span></li>
+            <li><strong>Troca grátis</strong><span>em até 30 dias</span></li>
           </ul>
         </div>
         <div className="hero-visual" aria-hidden="true">

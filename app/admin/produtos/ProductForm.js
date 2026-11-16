@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useActionState, useState } from "react";
 import ProductArt from "@/components/ProductArt";
+import ImageManager from "./ImageManager";
 import { CATEGORIES, COLLECTIONS, COLORS, GENDERS, SIZES, TAGS, slugify } from "@/lib/products";
 import { deleteProduct, saveProduct } from "../actions";
 
@@ -10,11 +11,12 @@ function Err({ msg }) {
   return msg ? <small className="err">{msg}</small> : null;
 }
 
-export default function ProductForm({ product }) {
+export default function ProductForm({ product, maxImages = 6 }) {
   const [state, action, pending] = useActionState(saveProduct, null);
   const v = state?.values ?? product ?? {};
   const e = state?.errors ?? {};
   const list = (k) => [].concat(v[k] ?? []);
+  const money = (x) => (typeof x === "number" ? x.toFixed(2).replace(".", ",") : x ?? "");
   // Cores já escolhidas primeiro (na ordem do produto), para não trocar a cor principal ao salvar.
   const chosen = list("colors").filter((c) => COLORS[c]);
   const colorOrder = [...chosen, ...Object.keys(COLORS).filter((c) => !chosen.includes(c))].map((id) => [id, COLORS[id]]);
@@ -98,12 +100,12 @@ export default function ProductForm({ product }) {
           <div className="form-grid three">
             <label className="field">
               <span>Preço (R$)</span>
-              <input id="price" name="price" inputMode="decimal" defaultValue={v.price} placeholder="189,90" />
+              <input id="price" name="price" inputMode="decimal" defaultValue={money(v.price)} placeholder="189,90" />
               <Err msg={e.price} />
             </label>
             <label className="field">
               <span>Preço &quot;de&quot; (opcional)</span>
-              <input id="oldPrice" name="oldPrice" inputMode="decimal" defaultValue={v.oldPrice ?? ""} placeholder="229,90" />
+              <input id="oldPrice" name="oldPrice" inputMode="decimal" defaultValue={money(v.oldPrice)} placeholder="229,90" />
               <Err msg={e.oldPrice} />
             </label>
             <label className="field">
@@ -167,10 +169,16 @@ export default function ProductForm({ product }) {
       </form>
 
       <aside className="editor-side">
-        <div className="editor-preview" data-bg={preview.color}>
-          <ProductArt product={{ category: preview.category, colors: [preview.color] }} color={preview.color} />
-        </div>
-        <p className="muted small">Pré-visualização. As fotos reais entram numa próxima etapa.</p>
+        {product?.id ? (
+          <ImageManager productId={product.id} initialImages={product.images ?? []} max={maxImages} />
+        ) : (
+          <>
+            <div className="editor-preview" data-bg={preview.color}>
+              <ProductArt product={{ category: preview.category, colors: [preview.color] }} color={preview.color} />
+            </div>
+            <p className="muted small">Salve o produto para poder adicionar fotos. Enquanto não houver fotos, a loja mostra este desenho.</p>
+          </>
+        )}
 
         {product?.id && (
           <div className="danger-zone">

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { COLORS } from "@/lib/products";
 import { FREE_SHIPPING, brl, cartTotals } from "@/lib/pricing";
-import ProductArt from "./ProductArt";
+import ProductImage from "./ProductImage";
 import { useStore } from "./StoreProvider";
 
 export default function CartDrawer() {
@@ -47,8 +47,8 @@ export default function CartDrawer() {
           )}
           {t.lines.map((l) => (
             <li className="cart-item" key={l.key}>
-              <Link href={`/produto/${l.product.slug}`} className="thumb" data-bg={l.color} onClick={closeCart}>
-                <ProductArt product={l.product} color={l.color} />
+              <Link href={`/produto/${l.product.slug}`} className={`thumb ${l.product.images?.length ? "has-photo" : ""}`} data-bg={l.color} onClick={closeCart}>
+                <ProductImage product={l.product} color={l.color} />
               </Link>
               <div className="ci-info">
                 <p className="ci-name">{l.product.name}</p>

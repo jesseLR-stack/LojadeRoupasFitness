@@ -1,5 +1,5 @@
 import Link from "next/link";
-import ProductArt from "@/components/ProductArt";
+import ProductImage from "@/components/ProductImage";
 import { db, missingSeedProducts } from "@/lib/db";
 import { brl } from "@/lib/pricing";
 import { categoryLabel } from "@/lib/products";
@@ -35,7 +35,7 @@ export default async function AdminProducts({ searchParams }) {
             <tbody>
               {products.map((p) => (
                 <tr key={p.id} className={p.active ? "" : "inactive"}>
-                  <td><div className="thumb xs" data-bg={p.colors[0]}><ProductArt product={p} /></div></td>
+                  <td><div className={`thumb xs ${p.images?.length ? "has-photo" : ""}`} data-bg={p.colors[0]}><ProductImage product={p} /></div></td>
                   <td><b>{p.name}</b><br /><span className="muted small">/produto/{p.slug}</span></td>
                   <td>{categoryLabel(p.category)}</td>
                   <td className="num">{p.oldPrice && <s className="muted">{brl(p.oldPrice)}</s>} {brl(p.price)}</td>
