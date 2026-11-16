@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { SESSION_COOKIE, SESSION_HOURS, adminPassword, checkPassword, createSessionToken, verifySessionToken } from "@/lib/auth";
-import { db, normalizeProductInput } from "@/lib/db";
+import { db, missingSeedProducts, normalizeProductInput } from "@/lib/db";
 import { ORDER_STATUSES } from "@/lib/orders";
 
 async function requireAdmin() {
@@ -73,10 +73,10 @@ export async function deleteProduct(formData) {
 
 export async function seedProducts() {
   await requireAdmin();
-  const existing = await db.listProducts({ includeInactive: true });
-  if (existing.length === 0) await db.seedProducts();
+  const missing = await missingSeedProducts();
+  await db.insertProducts(missing);
   refreshStore();
-  redirect("/admin/produtos");
+  redirect(`/admin/produtos?importados=${missing.length}`);
 }
 
 export async function setOrderStatus(formData) {

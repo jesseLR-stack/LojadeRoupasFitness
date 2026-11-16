@@ -1,13 +1,13 @@
 import Link from "next/link";
 import ProductArt from "@/components/ProductArt";
-import { db } from "@/lib/db";
+import { db, missingSeedProducts } from "@/lib/db";
 import { brl } from "@/lib/pricing";
 import { categoryLabel } from "@/lib/products";
 import { seedProducts } from "../actions";
 
 export default async function AdminProducts({ searchParams }) {
-  const { salvo, excluido } = await searchParams;
-  const products = await db.listProducts({ includeInactive: true });
+  const { salvo, excluido, importados } = await searchParams;
+  const [products, missing] = await Promise.all([db.listProducts({ includeInactive: true }), missingSeedProducts()]);
 
   return (
     <>
@@ -17,6 +17,7 @@ export default async function AdminProducts({ searchParams }) {
       </div>
       {salvo && <p className="admin-notice" role="status">Produto salvo. A loja já foi atualizada.</p>}
       {excluido && <p className="admin-notice" role="status">Produto excluído.</p>}
+      {importados && <p className="admin-notice" role="status">{importados} produto(s) de exemplo importado(s). Edite à vontade.</p>}
 
       {products.length === 0 ? (
         <div className="admin-empty">
@@ -25,6 +26,7 @@ export default async function AdminProducts({ searchParams }) {
           <form action={seedProducts}><button className="btn btn-ghost small" type="submit">Importar produtos de exemplo</button></form>
         </div>
       ) : (
+        <>
         <div className="table-wrap">
           <table className="admin-table">
             <thead>
@@ -49,6 +51,13 @@ export default async function AdminProducts({ searchParams }) {
             </tbody>
           </table>
         </div>
+        {missing.length > 0 && (
+          <form action={seedProducts} className="seed-row">
+            <span className="muted small">Quer preencher a loja com os produtos de exemplo? Faltam {missing.length}. Os que você cadastrou não são alterados.</span>
+            <button className="btn btn-ghost small" type="submit">Importar {missing.length} produto(s) de exemplo</button>
+          </form>
+        )}
+        </>
       )}
     </>
   );

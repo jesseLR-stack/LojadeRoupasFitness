@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 
 process.env.ADMIN_PASSWORD = "senha-forte-123";
 const { checkPassword, createSessionToken, verifySessionToken } = await import("../lib/auth.js");
-const { db, DB_MODE, OutOfStockError, normalizeProductInput } = await import("../lib/db.js");
+const { db, DB_MODE, OutOfStockError, missingSeedProducts, normalizeProductInput } = await import("../lib/db.js");
 
 test("senha do painel", async () => {
   assert.equal(await checkPassword("senha-forte-123"), true);
@@ -54,4 +54,18 @@ test("modo demonstração: produto oculto some da loja, mas não do painel", asy
   await db.saveProduct({ ...p, active: false });
   assert.ok(!(await db.listProducts()).some((x) => x.id === 3));
   assert.ok((await db.listProducts({ includeInactive: true })).some((x) => x.id === 3));
+});
+
+test("importar exemplos só adiciona os que faltam, sem mexer nos existentes", async () => {
+  const mine = await db.saveProduct({ name: "Camiseta de Time", slug: "camiseta-de-time", category: "camiseta", gender: "unissex",
+    collections: [], colors: ["preto"], sizes: ["M"], price: 1, oldPrice: null, stock: 2, tag: "", isNew: false, active: true,
+    description: "Produto cadastrado à mão." });
+  await db.deleteProduct(5);
+  const missing = await missingSeedProducts();
+  assert.deepEqual(missing.map((p) => p.slug), ["jaqueta-wind-shield"]);
+  await db.insertProducts(missing);
+  assert.equal((await missingSeedProducts()).length, 0);
+  const all = await db.listProducts({ includeInactive: true });
+  assert.equal(all.find((p) => p.slug === "camiseta-de-time").price, 1, "produto do usuário intacto");
+  assert.equal(new Set(all.map((p) => p.id)).size, all.length, "ids únicos");
 });
