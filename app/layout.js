@@ -1,8 +1,4 @@
 import "./globals.css";
-import CartDrawer from "@/components/CartDrawer";
-import Footer from "@/components/Footer";
-import Header from "@/components/Header";
-import { StoreProvider } from "@/components/StoreProvider";
 import { SITE_URL } from "@/lib/site";
 
 export const metadata = {
@@ -26,14 +22,7 @@ export default function RootLayout({ children }) {
           href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&display=swap"
         />
       </head>
-      <body>
-        <StoreProvider>
-          <Header />
-          <main>{children}</main>
-          <Footer />
-          <CartDrawer />
-        </StoreProvider>
-      </body>
+      <body>{children}</body>
     </html>
   );
 }

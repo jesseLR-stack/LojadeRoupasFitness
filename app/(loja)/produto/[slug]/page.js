@@ -2,18 +2,21 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import ProductCard from "@/components/ProductCard";
 import ProductView from "@/components/ProductView";
-import { PRODUCTS, categoryLabel, getProductBySlug, relatedProducts } from "@/lib/products";
+import { db } from "@/lib/db";
+import { categoryLabel, relatedProducts } from "@/lib/products";
 import { SITE_URL } from "@/lib/site";
 
-// Gera uma página estática para cada produto no build.
-export function generateStaticParams() {
-  return PRODUCTS.map((p) => ({ slug: p.slug }));
+export const revalidate = 60;
+
+// Gera uma página estática para cada produto no build; produtos novos são gerados na primeira visita.
+export async function generateStaticParams() {
+  return (await db.listProducts()).map((p) => ({ slug: p.slug }));
 }
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;
-  const p = getProductBySlug(slug);
-  if (!p) return {};
+  const p = await db.getProduct({ slug });
+  if (!p || !p.active) return {};
   return {
     title: p.name,
     description: p.description,
@@ -24,8 +27,9 @@ export async function generateMetadata({ params }) {
 
 export default async function ProductPage({ params }) {
   const { slug } = await params;
-  const product = getProductBySlug(slug);
-  if (!product) notFound();
+  const product = await db.getProduct({ slug });
+  if (!product || !product.active) notFound();
+  const related = relatedProducts(product, await db.listProducts());
 
   // Dados estruturados: ajudam o Google a mostrar preço e avaliação nos resultados.
   const jsonLd = {
@@ -41,7 +45,7 @@ export default async function ProductPage({ params }) {
       url: `${SITE_URL}/produto/${product.slug}`,
       priceCurrency: "BRL",
       price: product.price.toFixed(2),
-      availability: "https://schema.org/InStock",
+      availability: product.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
     },
   };
 
@@ -61,7 +65,7 @@ export default async function ProductPage({ params }) {
       <section className="related-section">
         <h2 className="section-title">Combina com</h2>
         <div className="product-grid">
-          {relatedProducts(product).map((p) => <ProductCard key={p.id} product={p} />)}
+          {related.map((p) => <ProductCard key={p.id} product={p} />)}
         </div>
       </section>
     </div>

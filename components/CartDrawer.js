@@ -9,10 +9,10 @@ import ProductArt from "./ProductArt";
 import { useStore } from "./StoreProvider";
 
 export default function CartDrawer() {
-  const { cart, coupon, cartOpen, closeCart, changeQty, removeItem, applyCoupon } = useStore();
+  const { catalog, cart, coupon, cartOpen, closeCart, changeQty, removeItem, applyCoupon } = useStore();
   const [code, setCode] = useState("");
   const router = useRouter();
-  const t = cartTotals(cart, coupon);
+  const t = cartTotals(cart, coupon, {}, catalog);
   const missing = FREE_SHIPPING - t.base;
 
   useEffect(() => {

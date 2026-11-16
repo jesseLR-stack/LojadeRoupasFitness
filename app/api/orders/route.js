@@ -1,7 +1,8 @@
 // POST /api/orders: recebe a sacola e os dados do cliente, valida tudo e recalcula o
 // total no servidor. Os preços enviados pelo navegador são ignorados de propósito.
+import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
-import { getProductById } from "@/lib/products";
+import { OutOfStockError, db } from "@/lib/db";
 import { COUPONS, MAX_INSTALLMENTS, PAY_OPTIONS, SHIP_OPTIONS, cartTotals } from "@/lib/pricing";
 import { STEP_FIELDS, validate } from "@/lib/validation";
 
@@ -21,8 +22,9 @@ export async function POST(request) {
   const { items, coupon = null, ship, pay, installments = 1, customer = {} } = body ?? {};
 
   if (!Array.isArray(items) || items.length === 0) return bad("A sacola está vazia");
+  const catalog = await db.listProducts();
   for (const i of items) {
-    const p = getProductById(i?.id);
+    const p = catalog.find((x) => x.id === i?.id);
     if (!p) return bad("Produto não encontrado");
     if (!p.colors.includes(i.color) || !p.sizes.includes(i.size)) return bad(`Cor ou tamanho indisponível: ${p.name}`);
     if (!Number.isInteger(i.qty) || i.qty < 1 || i.qty > MAX_QTY) return bad("Quantidade inválida");
@@ -36,10 +38,34 @@ export async function POST(request) {
   if (Object.keys(errors).length) return NextResponse.json({ error: "Confira seus dados", fields: errors }, { status: 422 });
 
   const cart = items.map(({ id, color, size, qty }) => ({ key: `${id}-${color}-${size}`, id, color, size, qty }));
-  const t = cartTotals(cart, coupon, { ship, pay });
+  const t = cartTotals(cart, coupon, { ship, pay }, catalog);
   const number = "NF" + Date.now().toString().slice(-6) + Math.floor(Math.random() * 10);
 
-  // TODO (próxima etapa): salvar o pedido no banco e criar a cobrança no Mercado Pago.
+  // Baixa o estoque de todos os itens de uma vez; se faltar algum, nada é baixado.
+  try {
+    await db.reserveStock(cart);
+  } catch (e) {
+    if (e instanceof OutOfStockError) {
+      const name = catalog.find((p) => p.id === e.productId)?.name ?? "um produto";
+      return bad(`Acabou o estoque de ${name}. Ajuste a sacola e tente de novo.`, 409);
+    }
+    throw e;
+  }
+
+  // TODO (próxima etapa): criar a cobrança no Mercado Pago.
+  const { nome, email, tel, cpf, cep, rua, numero: num, compl, bairro, cidade, uf } = customer;
+  await db.createOrder({
+    number,
+    status: "novo",
+    customer: { nome, email, tel, cpf, cep, rua, numero: num, compl: compl ?? "", bairro, cidade, uf },
+    items: t.lines.map((l) => ({ id: l.id, name: l.product.name, color: l.color, size: l.size, qty: l.qty, price: l.product.price })),
+    ship, pay,
+    installments: pay === "card" ? installments : 1,
+    coupon,
+    subtotal: t.subtotal, discount: t.discount, pix_discount: t.pix, shipping: t.shipping, total: t.total,
+  });
+  revalidatePath("/", "layout"); // atualiza o estoque mostrado na loja
+
   const order = {
     number,
     firstName: customer.nome.trim().split(/\s+/)[0],

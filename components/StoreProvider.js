@@ -13,7 +13,7 @@ function write(key, value) {
   try { localStorage.setItem(key, JSON.stringify(value)); } catch { /* sem armazenamento: segue em memória */ }
 }
 
-export function StoreProvider({ children }) {
+export function StoreProvider({ children, catalog = [] }) {
   const [cart, setCart] = useState([]);
   const [favs, setFavs] = useState([]);
   const [coupon, setCoupon] = useState(null);
@@ -43,18 +43,32 @@ export function StoreProvider({ children }) {
     toastTimer.current = setTimeout(() => setToastMsg(""), 2600);
   }, []);
 
+  // Quantas unidades deste produto já estão na sacola (somando cores e tamanhos).
+  const inCart = (c, id) => c.filter((i) => i.id === id).reduce((s, i) => s + i.qty, 0);
+  const stockOf = useCallback((id) => catalog.find((p) => p.id === id)?.stock ?? 0, [catalog]);
+
   const addToCart = useCallback((id, color, size, qty = 1) => {
+    if (inCart(cart, id) + qty > stockOf(id)) {
+      toast(stockOf(id) === 0 ? "Produto esgotado" : `Só temos ${stockOf(id)} unidade(s) desse produto`);
+      return false;
+    }
     const key = `${id}-${color}-${size}`;
     setCart((c) => c.some((i) => i.key === key)
       ? c.map((i) => (i.key === key ? { ...i, qty: i.qty + qty } : i))
       : [...c, { key, id, color, size, qty }]);
     setBump((b) => b + 1);
     toast("Adicionado à sacola ✓");
-  }, [toast]);
+    return true;
+  }, [cart, stockOf, toast]);
 
   const changeQty = useCallback((key, delta) => {
+    const item = cart.find((i) => i.key === key);
+    if (item && delta > 0 && inCart(cart, item.id) + delta > stockOf(item.id)) {
+      toast(`Só temos ${stockOf(item.id)} unidade(s) desse produto`);
+      return;
+    }
     setCart((c) => c.map((i) => (i.key === key ? { ...i, qty: i.qty + delta } : i)).filter((i) => i.qty > 0));
-  }, []);
+  }, [cart, stockOf, toast]);
 
   const removeItem = useCallback((key) => setCart((c) => c.filter((i) => i.key !== key)), []);
 
@@ -77,7 +91,7 @@ export function StoreProvider({ children }) {
   }, [toast]);
 
   const value = {
-    ready, cart, favs, coupon, cartOpen, bump,
+    ready, catalog, cart, favs, coupon, cartOpen, bump,
     addToCart, changeQty, removeItem, clearCart, toggleFav, applyCoupon, toast,
     openCart: () => setCartOpen(true),
     closeCart: () => setCartOpen(false),
