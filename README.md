@@ -48,6 +48,8 @@ Outros comandos:
 
 - Painel de administração em `/admin`: cadastrar, editar, ocultar e excluir produtos; preço "de/por"; estoque; ver pedidos e mudar o status (novo, pago, enviado, entregue, cancelado)
 - Estoque: produto esgotado não pode ser comprado, e a baixa de estoque é feita de uma vez para o pedido inteiro
+- Fotos: até 6 por produto, enviadas pelo painel (reduzidas no navegador antes do envio) e guardadas no Supabase Storage; a primeira é a principal
+- Avaliações só aparecem quando existirem avaliações reais (os exemplos não têm notas inventadas)
 
 O pagamento ainda é **simulado**: nenhuma cobrança real é feita.
 
@@ -63,7 +65,7 @@ Configuração (veja `.env.example`):
 ### Ligando o Supabase
 
 1. Crie um projeto em https://supabase.com (região South America - São Paulo).
-2. Em **SQL Editor**, cole o conteúdo de `supabase/schema.sql` e clique em **Run**.
+2. Em **SQL Editor**, cole o conteúdo de `supabase/schema.sql` e clique em **Run**. Depois faça o mesmo com `supabase/002_fotos_avaliacoes.sql`.
 3. Em **Project Settings → API**, copie a **Project URL** e a chave **service_role**.
 4. Na Vercel, em **Settings → Environment Variables**, cadastre `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` e `ADMIN_PASSWORD`, e faça um novo deploy.
 5. Entre em `/admin/produtos` e clique em **Importar produtos de exemplo** (ou cadastre do zero).
@@ -84,14 +86,14 @@ lib/
   products.js         categorias, cores e produtos de exemplo
   pricing.js          preços, cupons, frete e Pix (usado no navegador e no servidor)
   validation.js       máscaras e validações
-supabase/schema.sql   estrutura do banco
+supabase/             estrutura do banco (schema.sql e atualizações 002_…)
 middleware.js         protege o /admin
 tests/                testes automáticos
 ```
 
 ## Próximos passos
 
-1. Fotos reais dos produtos (substituir as silhuetas em `components/ProductArt.js`)
+1. Avaliações de clientes (quem comprou avalia o produto)
 2. Ligar o Supabase (passo a passo acima)
 3. Pagamento real com Mercado Pago (Pix, cartão e boleto) e frete real (Melhor Envio)
 4. Publicar o site (ex.: Vercel) com domínio próprio

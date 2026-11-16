@@ -69,3 +69,13 @@ test("importar exemplos só adiciona os que faltam, sem mexer nos existentes", a
   assert.equal(all.find((p) => p.slug === "camiseta-de-time").price, 1, "produto do usuário intacto");
   assert.equal(new Set(all.map((p) => p.id)).size, all.length, "ids únicos");
 });
+
+test("preço aceita formatos brasileiros", () => {
+  const base = { name: "Produto Teste", category: "top", gender: "feminino", colors: ["preto"], sizes: ["M"],
+    description: "Descrição de teste.", stock: "1" };
+  for (const [input, expected] of [["189,90", 189.9], ["1.299,90", 1299.9], ["189.90", 189.9], ["R$ 49,90", 49.9], [59, 59]]) {
+    const { product, errors } = normalizeProductInput({ ...base, price: input });
+    assert.equal(errors.price, undefined, String(input));
+    assert.equal(product.price, expected, String(input));
+  }
+});

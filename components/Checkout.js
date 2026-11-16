@@ -5,7 +5,7 @@ import { useRef, useState } from "react";
 import { COLORS } from "@/lib/products";
 import { MAX_INSTALLMENTS, PAY_OPTIONS, SHIP_OPTIONS, brl, cartTotals } from "@/lib/pricing";
 import { MASKS, RULES, STEP_FIELDS, validate } from "@/lib/validation";
-import ProductArt from "./ProductArt";
+import ProductImage from "./ProductImage";
 import { useStore } from "./StoreProvider";
 
 const STEPS = ["Dados", "Entrega", "Pagamento"];
@@ -226,7 +226,7 @@ export default function Checkout() {
         <ul className="sum-items">
           {t.lines.map((l) => (
             <li key={l.key}>
-              <div className="thumb sm" data-bg={l.color}><ProductArt product={l.product} color={l.color} /><span className="q">{l.qty}</span></div>
+              <div className={`thumb sm ${l.product.images?.length ? "has-photo" : ""}`} data-bg={l.color}><ProductImage product={l.product} color={l.color} /><span className="q">{l.qty}</span></div>
               <div><p>{l.product.name}</p><small>{COLORS[l.color].name} · {l.size}</small></div>
               <strong>{brl(l.product.price * l.qty)}</strong>
             </li>

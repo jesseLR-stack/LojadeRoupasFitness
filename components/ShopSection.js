@@ -90,7 +90,7 @@ export default function ShopSection() {
             <option value="featured">Destaques</option>
             <option value="price-asc">Menor preço</option>
             <option value="price-desc">Maior preço</option>
-            <option value="rating">Mais bem avaliados</option>
+            {catalog.some((p) => p.reviews > 0) && <option value="rating">Mais bem avaliados</option>}
             <option value="new">Lançamentos</option>
           </select>
         </div>
