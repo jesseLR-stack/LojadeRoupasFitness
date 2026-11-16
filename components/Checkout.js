@@ -29,7 +29,7 @@ function Field({ name, label, data, errors, onChange, full, ...props }) {
 }
 
 export default function Checkout() {
-  const { ready, cart, coupon, clearCart, toast } = useStore();
+  const { ready, catalog, cart, coupon, clearCart, toast } = useStore();
   const [step, setStep] = useState(1);
   const [data, setData] = useState({});
   const [errors, setErrors] = useState({});
@@ -41,7 +41,7 @@ export default function Checkout() {
   const [order, setOrder] = useState(null);
   const formRef = useRef(null);
 
-  const t = cartTotals(cart, coupon, { ship: step >= 2 ? ship : undefined, pay: step >= 3 ? pay : undefined });
+  const t = cartTotals(cart, coupon, { ship: step >= 2 ? ship : undefined, pay: step >= 3 ? pay : undefined }, catalog);
 
   async function lookupCEP(cep) {
     setCepHint("Buscando endereço…");

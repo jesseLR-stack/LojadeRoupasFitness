@@ -10,6 +10,7 @@ import { HeartIcon, stars } from "./icons";
 export default function ProductCard({ product: p }) {
   const { favs, toggleFav, addToCart } = useStore();
   const fav = favs.includes(p.id);
+  const soldOut = p.stock <= 0;
   const discount = p.oldPrice ? Math.round((1 - p.price / p.oldPrice) * 100) : 0;
 
   const quickAdd = (e) => {
@@ -18,10 +19,11 @@ export default function ProductCard({ product: p }) {
   };
 
   return (
-    <article className="card">
+    <article className={`card ${soldOut ? "sold-out" : ""}`}>
       <div className="card-media" data-bg={p.colors[0]}>
         <div className="tags">
-          {p.tag && <span className="tag">{p.tag}</span>}
+          {soldOut && <span className="tag tag-out">Esgotado</span>}
+          {!soldOut && p.tag && <span className="tag">{p.tag}</span>}
           {discount > 0 && <span className="tag tag-off">-{discount}%</span>}
         </div>
         <button
@@ -35,7 +37,7 @@ export default function ProductCard({ product: p }) {
         <Link href={`/produto/${p.slug}`} className="card-link" aria-label={p.name}>
           <ProductArt product={p} />
         </Link>
-        <button className="quick-add" onClick={quickAdd}>+ Adicionar rápido</button>
+        {!soldOut && <button className="quick-add" onClick={quickAdd}>+ Adicionar rápido</button>}
       </div>
       <Link href={`/produto/${p.slug}`} className="card-body">
         <div className="swatches">

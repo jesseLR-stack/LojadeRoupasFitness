@@ -1,7 +1,9 @@
-// GET /api/products: catálogo em JSON (base para o painel de administração e apps).
+// GET /api/products: catálogo ativo em JSON.
 import { NextResponse } from "next/server";
-import { PRODUCTS } from "@/lib/products";
+import { db } from "@/lib/db";
 
-export function GET() {
-  return NextResponse.json({ products: PRODUCTS });
+export const dynamic = "force-dynamic";
+
+export async function GET() {
+  return NextResponse.json({ products: await db.listProducts() });
 }

@@ -14,6 +14,7 @@ export default function ProductView({ product: p }) {
   const [size, setSize] = useState(null);
   const [shake, setShake] = useState(false);
   const fav = favs.includes(p.id);
+  const soldOut = p.stock <= 0;
 
   const add = () => {
     if (!size) {
@@ -21,8 +22,7 @@ export default function ProductView({ product: p }) {
       setTimeout(() => setShake(false), 500);
       return toast("Escolha um tamanho 😉");
     }
-    addToCart(p.id, color, size);
-    openCart();
+    if (addToCart(p.id, color, size)) openCart();
   };
 
   return (
@@ -64,7 +64,9 @@ export default function ProductView({ product: p }) {
         </div>
 
         <div className="pdp-actions">
-          <button className="btn btn-primary" onClick={add}>Adicionar à sacola</button>
+          <button className="btn btn-primary" onClick={add} disabled={soldOut}>
+            {soldOut ? "Esgotado" : "Adicionar à sacola"}
+          </button>
           <button
             className={`btn btn-ghost fav-inline ${fav ? "on" : ""}`}
             onClick={() => toggleFav(p.id)}
@@ -74,6 +76,7 @@ export default function ProductView({ product: p }) {
             <HeartIcon />
           </button>
         </div>
+        {!soldOut && p.stock <= 5 && <p className="low-stock">Corra! Só restam {p.stock} unidade(s).</p>}
         <ul className="perks">
           <li>✓ Tecido Dry‑Fit antissuor</li>
           <li>✓ Troca grátis em 30 dias</li>

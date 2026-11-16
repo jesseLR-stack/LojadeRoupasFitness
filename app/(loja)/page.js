@@ -3,7 +3,7 @@ import { Suspense } from "react";
 import Newsletter from "@/components/Newsletter";
 import ProductArt from "@/components/ProductArt";
 import ShopSection from "@/components/ShopSection";
-import { PRODUCTS } from "@/lib/products";
+import { SEED_PRODUCTS } from "@/lib/products";
 
 const MARQUEE = ["LEGGINGS", "TOPS", "SHORTS", "REGATAS", "JAQUETAS", "CAMISETAS"];
 
@@ -36,8 +36,8 @@ export default function HomePage() {
         </div>
         <div className="hero-visual" aria-hidden="true">
           <div className="blob" />
-          <div className="hero-card hero-card-1" data-bg="vinho"><ProductArt product={PRODUCTS[0]} color="vinho" /></div>
-          <div className="hero-card hero-card-2" data-bg="lima"><ProductArt product={PRODUCTS[1]} color="lima" /></div>
+          <div className="hero-card hero-card-1" data-bg="vinho"><ProductArt product={SEED_PRODUCTS[0]} color="vinho" /></div>
+          <div className="hero-card hero-card-2" data-bg="lima"><ProductArt product={SEED_PRODUCTS[1]} color="lima" /></div>
           <div className="badge-spin">
             <svg viewBox="0 0 100 100">
               <defs><path id="circ" d="M50 50m-38 0a38 38 0 1 1 76 0a38 38 0 1 1 -76 0" /></defs>

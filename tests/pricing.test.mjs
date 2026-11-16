@@ -2,40 +2,41 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { cartTotals, FREE_SHIPPING, SHIPPING_COST } from "../lib/pricing.js";
 import { validCPF, RULES, MASKS } from "../lib/validation.js";
+import { SEED_PRODUCTS as CATALOG } from "../lib/products.js";
 
 const legging = { key: "a", id: 1, color: "preto", size: "M", qty: 1 }; // R$ 189,90
 const jaqueta = { key: "b", id: 5, color: "preto", size: "M", qty: 1 }; // R$ 299,90
 
 test("sacola vazia não cobra frete", () => {
   assert.deepEqual(
-    { subtotal: cartTotals([], null).subtotal, shipping: cartTotals([], null).shipping, total: cartTotals([], null).total },
+    { subtotal: cartTotals([], null, {}, CATALOG).subtotal, shipping: cartTotals([], null, {}, CATALOG).shipping, total: cartTotals([], null, {}, CATALOG).total },
     { subtotal: 0, shipping: 0, total: 0 },
   );
 });
 
 test("abaixo de R$ 299 cobra frete PAC", () => {
-  const t = cartTotals([legging], null);
+  const t = cartTotals([legging], null, {}, CATALOG);
   assert.equal(t.subtotal, 189.9);
   assert.equal(t.shipping, SHIPPING_COST);
   assert.equal(t.total, 214.8);
 });
 
 test("frete grátis considera o valor já com cupom", () => {
-  const t = cartTotals([jaqueta], "NEW10"); // 299,90 - 10% = 269,91
+  const t = cartTotals([jaqueta], "NEW10", {}, CATALOG); // 299,90 - 10% = 269,91
   assert.ok(t.base < FREE_SHIPPING);
   assert.equal(t.shipping, SHIPPING_COST);
-  assert.equal(cartTotals([jaqueta], null).shipping, 0);
+  assert.equal(cartTotals([jaqueta], null, {}, CATALOG).shipping, 0);
 });
 
 test("Pix dá 5% sobre os produtos, não sobre o frete", () => {
-  const t = cartTotals([legging, jaqueta], null, { ship: "sedex", pay: "pix" });
+  const t = cartTotals([legging, jaqueta], null, { ship: "sedex", pay: "pix" }, CATALOG);
   assert.equal(t.subtotal, 489.8);
   assert.equal(t.pix, 24.49);
   assert.equal(t.total, 505.21); // 489,80 - 24,49 + 39,90
 });
 
 test("cupom inválido é ignorado e produto inexistente some", () => {
-  const t = cartTotals([legging, { key: "x", id: 999, color: "preto", size: "M", qty: 1 }], "FAKE");
+  const t = cartTotals([legging, { key: "x", id: 999, color: "preto", size: "M", qty: 1 }], "FAKE", {}, CATALOG);
   assert.equal(t.discount, 0);
   assert.equal(t.lines.length, 1);
 });

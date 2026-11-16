@@ -2,7 +2,7 @@
 
 import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { CATEGORIES, COLLECTIONS, PRODUCTS } from "@/lib/products";
+import { CATEGORIES, COLLECTIONS } from "@/lib/products";
 import ProductCard from "./ProductCard";
 import { useStore } from "./StoreProvider";
 import { SearchIcon } from "./icons";
@@ -16,7 +16,7 @@ const SORTERS = {
 
 export default function ShopSection() {
   const params = useSearchParams();
-  const { favs } = useStore();
+  const { favs, catalog } = useStore();
   const searchRef = useRef(null);
   const [category, setCategory] = useState("all");
   const [gender, setGender] = useState("all");
@@ -35,7 +35,7 @@ export default function ShopSection() {
 
   const list = useMemo(() => {
     const q = query.trim().toLowerCase();
-    const filtered = PRODUCTS.filter((p) =>
+    const filtered = catalog.filter((p) =>
       (category === "all" || p.category === category) &&
       (gender === "all" || p.gender === gender || p.gender === "unissex") &&
       (collection === "all" || p.collections.includes(collection)) &&
@@ -43,7 +43,7 @@ export default function ShopSection() {
       (!q || `${p.name} ${p.category} ${p.description}`.toLowerCase().includes(q))
     );
     return SORTERS[sort] ? [...filtered].sort(SORTERS[sort]) : filtered;
-  }, [category, gender, collection, sort, query, onlyFavs, favs]);
+  }, [catalog, category, gender, collection, sort, query, onlyFavs, favs]);
 
   return (
     <section className="shop" id="loja">
