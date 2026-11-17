@@ -11,9 +11,7 @@ export const POLICY_LINKS = [
 
 // Bloco com os canais de atendimento configurados.
 export function ContactLines() {
-  if (!STORE.email && !STORE.whatsapp) {
-    return <p>Use o formulário de contato da loja ou responda ao e-mail de confirmação do seu pedido.</p>;
-  }
+  if (!STORE.email && !STORE.whatsapp) return null;
   return (
     <ul>
       {STORE.email && <li>E-mail: <a href={`mailto:${STORE.email}`}>{STORE.email}</a></li>}

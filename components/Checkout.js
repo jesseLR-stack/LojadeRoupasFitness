@@ -268,7 +268,7 @@ function Confirmation({ order, toast }) {
         <p className="eyebrow">Pedido {order.number}</p>
         <h2>Valeu, {order.firstName}!</h2>
         <p className="muted">
-          Enviamos a confirmação para <b>{order.email}</b>. Total: <b>{brl(order.total)}</b> · {order.shipLabel} ({order.eta}).
+          Guarde o número do pedido para acompanhar ou pedir uma troca. Total: <b>{brl(order.total)}</b> · {order.shipLabel} ({order.eta}).
         </p>
         {order.pay === "pix" && (
           <div className="pix-box">
@@ -277,7 +277,7 @@ function Confirmation({ order, toast }) {
             <button className="btn btn-primary small" onClick={copy}>Copiar código</button>
           </div>
         )}
-        {order.pay === "boleto" && <p className="pay-note">O boleto foi enviado para o seu e-mail e vence em 3 dias úteis.</p>}
+        {order.pay === "boleto" && <p className="pay-note">Pagamento por boleto, com vencimento em 3 dias úteis.</p>}
         {order.pay === "card" && <p className="pay-note">Pagamento aprovado em {order.installments}x de {brl(order.total / order.installments)}.</p>}
         <Link href="/" className="btn btn-ghost">Continuar comprando</Link>
       </div>

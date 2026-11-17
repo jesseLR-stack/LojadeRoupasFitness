@@ -56,7 +56,7 @@ export default function ReturnsPage() {
 
       <h2>Como pedir</h2>
       <ol>
-        <li>Fale com a gente informando o <b>número do pedido</b> (começa com &quot;NF&quot;, está no e-mail de confirmação), a peça e o motivo.</li>
+        <li>Fale com a gente informando o <b>número do pedido</b> (começa com &quot;NF&quot;, aparece na tela de confirmação da compra), a peça e o motivo.</li>
         <li>Respondemos em até 2 dias úteis com o código de postagem e as instruções.</li>
         <li>Embale bem a peça e leve a uma agência dos Correios em até 7 dias depois de receber o código.</li>
         <li>Quando a peça chegar, conferimos e, em até 3 dias úteis, enviamos a peça nova ou fazemos o reembolso.</li>
