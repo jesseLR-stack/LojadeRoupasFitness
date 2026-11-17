@@ -50,7 +50,7 @@ export default function AboutPage() {
           <li><b>Avaliações reais:</b> só quem recebeu o produto pode avaliar, e nenhuma nota é inventada.</li>
           <li><b>Seus dados protegidos</b>, usados só para entregar seu pedido. <Link href="/privacidade">Política de privacidade</Link>.</li>
         </ul>
-        <Link href="/#loja" className="btn btn-primary">Ver a coleção</Link>
+        <Link href="/#loja" className="btn btn-primary">Ver a coleção <span aria-hidden="true">→</span></Link>
       </section>
     </div>
   );

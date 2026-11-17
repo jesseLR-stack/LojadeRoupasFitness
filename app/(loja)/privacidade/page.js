@@ -22,6 +22,7 @@ export default function PrivacyPage() {
 
       <h2>Quais dados coletamos</h2>
       <ul>
+        <li><b>Ao criar sua conta:</b> nome, e-mail e senha. A senha é guardada de forma criptografada (com hash), e nem a loja consegue lê-la.</li>
         <li><b>Ao finalizar uma compra:</b> nome, e-mail, celular, CPF e endereço de entrega, além dos produtos, valores e forma de pagamento do pedido.</li>
         <li><b>Dados do cartão:</b> não ficam guardados na loja. Quando o pagamento online estiver ativo, eles serão digitados diretamente no ambiente seguro do intermediador de pagamento.</li>
         <li><b>No seu navegador:</b> a sacola, os favoritos e o cupom ficam salvos só no seu próprio aparelho (armazenamento local), para você não perdê-los ao fechar a página. Não usamos cookies de propaganda nem ferramentas de rastreamento.</li>

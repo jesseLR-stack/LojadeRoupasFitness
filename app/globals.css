@@ -584,7 +584,7 @@ a.stat:hover { border-color: var(--muted); }
 .policy-body h2 { font-size: 20px; color: var(--text); margin: 36px 0 10px; }
 .policy-body p, .policy-body ul, .policy-body ol { margin-bottom: 12px; }
 .policy-body ul, .policy-body ol { padding-left: 22px; display: grid; gap: 6px; }
-.policy-body a { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
+.policy-body a:not(.btn) { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
 .policy-body b { color: var(--text); }
 .policy-intro { font-size: 18px; color: var(--muted); }
 .policy-foot { margin-top: 32px; padding-top: 20px; border-top: 1px solid var(--line); color: var(--muted); }
@@ -615,7 +615,9 @@ a.stat:hover { border-color: var(--muted); }
 .auth-page { max-width: 420px; margin: 48px auto 0; padding: 0 16px; display: grid; gap: 10px; }
 .auth-page h1, .account h1 { font-family: var(--display); font-weight: 400; font-size: 52px; line-height: 1; letter-spacing: .02em; }
 .auth-form { display: grid; gap: 14px; margin-top: 10px; background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 24px; }
-.auth-form a, .account a, .account-note a { color: var(--accent); }
+.auth-form a:not(.btn), .account a:not(.btn), .account-note a:not(.btn) { color: var(--accent); }
+.cart-hint { font-size: 12px; color: var(--muted); text-align: center; margin-top: 10px; }
+.purchase-note { background: rgba(198,255,0,.08); border: 1px solid rgba(198,255,0,.3); color: var(--text); border-radius: 12px; padding: 12px 14px; font-size: 14px; }
 .account-note { font-size: 13px; color: var(--muted); background: var(--surface-2); border-radius: 12px; padding: 10px 14px; margin-bottom: 16px; }
 .account { padding: 32px clamp(16px, 4vw, 56px) 0; max-width: 1000px; margin: 0 auto; }
 .account-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; margin-bottom: 28px; }
@@ -647,7 +649,7 @@ a.stat:hover { border-color: var(--muted); }
 .reviews-section { margin-top: clamp(56px, 8vw, 100px); }
 .reviews-section .section-title { margin-bottom: 24px; }
 .reviews-empty { border: 1px dashed var(--line); border-radius: 18px; padding: 28px 24px; display: grid; gap: 6px; }
-.reviews-empty a, .about-promises a, .account-note a, .auth-form a { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
+.reviews-empty a:not(.btn), .about-promises a:not(.btn), .account-note a:not(.btn), .auth-form a:not(.btn) { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
 .reviews-grid { display: grid; grid-template-columns: 280px 1fr; gap: 32px; align-items: start; }
 .reviews-summary { display: grid; gap: 6px; background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 22px; }
 .reviews-summary > strong { font-family: var(--display); font-weight: 400; font-size: 64px; line-height: 1; }
@@ -720,7 +722,7 @@ a.stat:hover { border-color: var(--muted); }
 .about-pillars p { color: #d4d4d8; line-height: 1.6; }
 .about-promises { margin-top: clamp(48px, 7vw, 88px); display: grid; gap: 18px; justify-items: start; }
 .about-promises ul { display: grid; gap: 10px; padding-left: 20px; color: #d4d4d8; max-width: 720px; line-height: 1.6; }
-.about-promises a { color: var(--accent); }
+.about-promises a:not(.btn) { color: var(--accent); }
 
 /* ===== Responsivo ===== */
 @media (max-width: 900px) {
