@@ -33,6 +33,7 @@ Outros comandos:
 | `/produto/<nome-do-produto>` | Página própria de cada produto |
 | `/checkout` | Finalizar compra em 3 etapas |
 | `/admin` | Painel: pedidos, produtos, preços e estoque (com senha) |
+| `/trocas-e-devolucoes`, `/entrega`, `/privacidade`, `/termos`, `/contato` | Políticas da loja e atendimento |
 | `/api/products` | Catálogo em JSON |
 | `/api/orders` | Recebe pedidos (POST) e recalcula o total no servidor |
 | `/sitemap.xml`, `/robots.txt` | Para o Google indexar a loja |
@@ -61,6 +62,8 @@ Configuração (veja `.env.example`):
 | --- | --- |
 | `ADMIN_PASSWORD` | Senha do painel. Sem ela, o painel fica trancado no site publicado. No seu computador (`npm run dev`) a senha padrão é `admin`. |
 | `SUPABASE_URL` e `SUPABASE_SERVICE_ROLE_KEY` | Liga o banco de dados. Sem elas, a loja roda em **modo demonstração** (dados de exemplo na memória, que somem quando o servidor reinicia). |
+
+| `STORE_LEGAL_NAME`, `STORE_DOCUMENT`, `STORE_ADDRESS`, `STORE_EMAIL`, `STORE_WHATSAPP` | Dados da loja exigidos por lei (Decreto 7.962/2013). Aparecem no rodapé, nas políticas e em "Fale conosco". O painel avisa enquanto faltarem. |
 
 ### Ligando o Supabase
 
