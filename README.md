@@ -74,7 +74,7 @@ Configuração (veja `.env.example`):
 ### Ligando o Supabase
 
 1. Crie um projeto em https://supabase.com (região South America - São Paulo).
-2. Em **SQL Editor**, cole o conteúdo de `supabase/schema.sql` e clique em **Run**. Depois faça o mesmo, nesta ordem, com `supabase/002_fotos_avaliacoes.sql` e `supabase/003_clientes_avaliacoes_cupons.sql`.
+2. Em **SQL Editor**, cole o conteúdo de `supabase/schema.sql` e clique em **Run**. Depois faça o mesmo, nesta ordem, com `supabase/002_fotos_avaliacoes.sql`, `supabase/003_clientes_avaliacoes_cupons.sql` e `supabase/004_cores.sql`.
 3. Em **Project Settings → API**, copie a **Project URL** e a chave **service_role**.
 4. Na Vercel, em **Settings → Environment Variables**, cadastre `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` e `ADMIN_PASSWORD`, e faça um novo deploy.
 5. Entre em `/admin/produtos` e clique em **Importar produtos de exemplo** (ou cadastre do zero).

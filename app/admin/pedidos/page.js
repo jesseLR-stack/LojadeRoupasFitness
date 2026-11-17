@@ -1,7 +1,7 @@
 import { db } from "@/lib/db";
 import { ORDER_STATUSES } from "@/lib/orders";
 import { PAY_OPTIONS, SHIP_OPTIONS, brl } from "@/lib/pricing";
-import { COLORS } from "@/lib/products";
+import { colorOf } from "@/lib/colors";
 import StatusSelect from "./StatusSelect";
 
 const dateFmt = new Intl.DateTimeFormat("pt-BR", { dateStyle: "short", timeStyle: "short", timeZone: "America/Sao_Paulo" });
@@ -47,7 +47,7 @@ export default async function AdminOrders() {
                   <td>
                     <ul className="order-items">
                       {o.items.map((i, k) => (
-                        <li key={k}>{i.qty}× {i.name} <span className="muted">({COLORS[i.color]?.name ?? i.color}, {i.size})</span></li>
+                        <li key={k}>{i.qty}× {i.name} <span className="muted">({colorOf(i.color).name}, {i.size})</span></li>
                       ))}
                     </ul>
                   </td>

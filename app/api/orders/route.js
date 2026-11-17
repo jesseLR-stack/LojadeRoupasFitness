@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 import { OutOfStockError, db } from "@/lib/db";
 import { currentCustomer } from "@/lib/session";
+import { normalizeColor } from "@/lib/colors";
 import { couponProblem, normalizeCode } from "@/lib/coupons";
 import { MAX_INSTALLMENTS, PAY_OPTIONS, SHIP_OPTIONS, cartTotals } from "@/lib/pricing";
 import { STEP_FIELDS, validate } from "@/lib/validation";
@@ -28,6 +29,7 @@ export async function POST(request) {
   if (!Array.isArray(items) || items.length === 0) return bad("A sacola está vazia");
   const catalog = await db.listProducts();
   for (const i of items) {
+    if (i && typeof i.color === "string") i.color = normalizeColor(i.color);
     const p = catalog.find((x) => x.id === i?.id);
     if (!p) return bad("Produto não encontrado");
     if (!p.colors.includes(i.color) || !p.sizes.includes(i.size)) return bad(`Cor ou tamanho indisponível: ${p.name}`);

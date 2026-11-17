@@ -120,16 +120,6 @@ button { cursor: pointer; background: none; border: 0; }
 .art[data-light="true"] .zip { fill: rgba(0,0,0,.35); }
 
 [data-bg] { background: linear-gradient(160deg, #26262e, #16161b); }
-[data-bg="preto"]  { background: linear-gradient(160deg, #ecebe6, #d6d4cc); }
-[data-bg="lima"]   { background: linear-gradient(160deg, #3a4a10, #171d06); }
-[data-bg="vinho"]  { background: linear-gradient(160deg, #f3c9d6, #e4a3b8); }
-[data-bg="lilas"]  { background: linear-gradient(160deg, #2e2350, #18132a); }
-[data-bg="oceano"] { background: linear-gradient(160deg, #cfe0ff, #a7c3f6); }
-[data-bg="areia"]  { background: linear-gradient(160deg, #4a3f30, #231d15); }
-[data-bg="coral"]  { background: linear-gradient(160deg, #ffe1dc, #ffc2b8); }
-[data-bg="verde"]  { background: linear-gradient(160deg, #e3e9d6, #c8d4b2); }
-[data-bg="cinza"]  { background: linear-gradient(160deg, #e9eaee, #cfd2d8); }
-[data-bg="branco"] { background: linear-gradient(160deg, #343a46, #1b1e25); }
 
 /* ===== Marquee ===== */
 .marquee { overflow: hidden; border-block: 1px solid var(--line); background: var(--surface); transform: rotate(-1.2deg); margin: 0; }
@@ -206,7 +196,8 @@ select option { background: var(--surface); }
 .quick-add:hover { background: var(--accent); color: var(--accent-ink); }
 .card:hover .quick-add, .card:focus-within .quick-add { transform: none; }
 .card-body { padding: 14px 4px 0; }
-.swatches { display: flex; gap: 6px; margin-bottom: 8px; }
+.swatches { display: flex; gap: 6px; margin-bottom: 8px; align-items: center; flex-wrap: wrap; }
+.more-colors { font-size: 12px; color: var(--muted); font-weight: 600; }
 .swatches span { width: 14px; height: 14px; border-radius: 50%; border: 1px solid rgba(255,255,255,.25); }
 .card h3 { font-size: 16px; font-weight: 600; }
 .rating { color: var(--muted); font-size: 13px; margin: 2px 0 6px; }
@@ -532,6 +523,7 @@ a.stat:hover { border-color: var(--muted); }
 .check-row .check { border: 1px solid var(--line); border-radius: 999px; padding: 7px 12px; }
 .check-row .check:has(input:checked) { border-color: var(--accent); background: rgba(198,255,0,.06); }
 .check input { accent-color: var(--accent); width: 16px; height: 16px; }
+.color-group { display: grid; gap: 6px; margin-top: 6px; }
 .swatch-check i { width: 14px; height: 14px; border-radius: 50%; border: 1px solid rgba(255,255,255,.3); }
 .hint { color: var(--muted); font-size: 12px; }
 .form-error { color: var(--hot); background: rgba(255,77,109,.1); border-radius: 10px; padding: 10px 14px; font-size: 14px; }

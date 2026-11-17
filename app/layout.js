@@ -1,4 +1,5 @@
 import "./globals.css";
+import { colorBackgroundsCss } from "@/lib/colors";
 import { SITE_URL } from "@/lib/site";
 
 export const metadata = {
@@ -21,6 +22,8 @@ export default function RootLayout({ children }) {
           rel="stylesheet"
           href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&display=swap"
         />
+        {/* Fundo dos cartões de cada cor (gerado de lib/colors.js) */}
+        <style dangerouslySetInnerHTML={{ __html: colorBackgroundsCss() }} />
       </head>
       <body>{children}</body>
     </html>

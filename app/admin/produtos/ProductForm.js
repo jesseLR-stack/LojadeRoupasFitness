@@ -4,7 +4,8 @@ import Link from "next/link";
 import { useActionState, useState } from "react";
 import ProductArt from "@/components/ProductArt";
 import ImageManager from "./ImageManager";
-import { CATEGORIES, COLLECTIONS, COLORS, GENDERS, SIZES, TAGS, slugify } from "@/lib/products";
+import { COLORS, COLOR_GROUPS, normalizeColor } from "@/lib/colors";
+import { CATEGORIES, COLLECTIONS, GENDERS, SIZES, TAGS, slugify } from "@/lib/products";
 import { deleteProduct, saveProduct } from "../actions";
 
 function Err({ msg }) {
@@ -17,9 +18,12 @@ export default function ProductForm({ product, maxImages = 6 }) {
   const e = state?.errors ?? {};
   const list = (k) => [].concat(v[k] ?? []);
   const money = (x) => (typeof x === "number" ? x.toFixed(2).replace(".", ",") : x ?? "");
-  // Cores já escolhidas primeiro (na ordem do produto), para não trocar a cor principal ao salvar.
-  const chosen = list("colors").filter((c) => COLORS[c]);
-  const colorOrder = [...chosen, ...Object.keys(COLORS).filter((c) => !chosen.includes(c))].map((id) => [id, COLORS[id]]);
+  // Cores já escolhidas aparecem primeiro (na ordem do produto), para não trocar a cor principal ao salvar.
+  const chosen = [...new Set(list("colors").map(normalizeColor))].filter((c) => COLORS[c]);
+  const colorGroups = [
+    ...(chosen.length ? [{ label: "Escolhidas (a primeira é a principal)", ids: chosen }] : []),
+    ...COLOR_GROUPS.map((g) => ({ label: g.label, ids: g.colors.map(([id]) => id).filter((id) => !chosen.includes(id)) })),
+  ].filter((g) => g.ids.length);
 
   // Pré-visualização ao vivo da peça
   const [preview, setPreview] = useState({
@@ -121,14 +125,19 @@ export default function ProductForm({ product, maxImages = 6 }) {
           <div className="field full">
             <span>Cores disponíveis</span>
             <small className="hint">A primeira cor marcada é a principal: é ela que aparece no cartão da loja.</small>
-            <div className="check-row">
-              {colorOrder.map(([id, c]) => (
-                <label key={id} className="check swatch-check">
-                  <input type="checkbox" name="colors" value={id} defaultChecked={list("colors").includes(id)} />
-                  <i style={{ background: c.hex }} /> {c.name}
-                </label>
-              ))}
-            </div>
+            {colorGroups.map((g) => (
+              <div key={g.label} className="color-group">
+                <small className="hint">{g.label}</small>
+                <div className="check-row">
+                  {g.ids.map((id) => (
+                    <label key={id} className="check swatch-check">
+                      <input type="checkbox" name="colors" value={id} defaultChecked={chosen.includes(id)} />
+                      <i style={{ background: COLORS[id].hex }} /> {COLORS[id].name}
+                    </label>
+                  ))}
+                </div>
+              </div>
+            ))}
             <Err msg={e.colors} />
           </div>
           <div className="field full">

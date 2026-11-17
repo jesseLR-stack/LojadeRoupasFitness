@@ -1,12 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { COLORS } from "@/lib/products";
+import { colorOf } from "@/lib/colors";
 import { brl } from "@/lib/pricing";
 import ProductImage from "./ProductImage";
 import { useStore } from "./StoreProvider";
 import Rating from "./Rating";
 import { HeartIcon } from "./icons";
+
+const MAX_SWATCHES = 6;
 
 export default function ProductCard({ product: p }) {
   const { favs, toggleFav, addToCart } = useStore();
@@ -42,7 +44,8 @@ export default function ProductCard({ product: p }) {
       </div>
       <Link href={`/produto/${p.slug}`} className="card-body">
         <div className="swatches">
-          {p.colors.map((c) => <span key={c} style={{ background: COLORS[c].hex }} title={COLORS[c].name} />)}
+          {p.colors.slice(0, MAX_SWATCHES).map((c) => <span key={c} style={{ background: colorOf(c).hex }} title={colorOf(c).name} />)}
+          {p.colors.length > MAX_SWATCHES && <small className="more-colors">+{p.colors.length - MAX_SWATCHES}</small>}
         </div>
         <h3>{p.name}</h3>
         <Rating product={p} />
