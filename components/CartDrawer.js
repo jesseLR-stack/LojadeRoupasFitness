@@ -9,7 +9,7 @@ import ProductImage from "./ProductImage";
 import { useStore } from "./StoreProvider";
 
 export default function CartDrawer() {
-  const { catalog, cart, coupon, cartOpen, closeCart, changeQty, removeItem, applyCoupon } = useStore();
+  const { catalog, cart, coupon, cartOpen, closeCart, changeQty, removeItem, applyCoupon, removeCoupon } = useStore();
   const [code, setCode] = useState("");
   const router = useRouter();
   const t = cartTotals(cart, coupon, {}, catalog);
@@ -24,7 +24,7 @@ export default function CartDrawer() {
   return (
     <>
       <div className={`overlay ${cartOpen ? "show" : ""}`} onClick={closeCart} />
-      <aside className={`cart-drawer ${cartOpen ? "open" : ""}`} aria-label="Sacola de compras" aria-hidden={!cartOpen}>
+      <aside className={`cart-drawer ${cartOpen ? "open" : ""}`} aria-label="Sacola de compras" inert={!cartOpen}>
         <div className="cart-head">
           <h3>Sua sacola</h3>
           <button className="icon-btn" onClick={closeCart} aria-label="Fechar sacola">✕</button>
@@ -68,13 +68,18 @@ export default function CartDrawer() {
         </ul>
 
         <div className="cart-foot">
-          <form className="coupon" onSubmit={(e) => { e.preventDefault(); if (applyCoupon(code)) setCode(""); }}>
+          <form className="coupon" onSubmit={async (e) => { e.preventDefault(); if (await applyCoupon(code)) setCode(""); }}>
             <input id="couponInput" value={code} onChange={(e) => setCode(e.target.value)} placeholder="Cupom de desconto" />
             <button className="btn btn-ghost small" type="submit">Aplicar</button>
           </form>
           <dl className="totals">
             <div><dt>Subtotal</dt><dd>{brl(t.subtotal)}</dd></div>
-            {t.discount > 0 && <div className="disc"><dt>Cupom {coupon}</dt><dd>− {brl(t.discount)}</dd></div>}
+            {t.discount > 0 && (
+              <div className="disc">
+                <dt>Cupom {coupon.code} <button type="button" className="link-btn" onClick={removeCoupon}>remover</button></dt>
+                <dd>− {brl(t.discount)}</dd>
+              </div>
+            )}
             <div><dt>Frete</dt><dd>{t.shipping ? brl(t.shipping) : "Grátis"}</dd></div>
             <div className="grand"><dt>Total</dt><dd>{brl(t.total)}</dd></div>
           </dl>

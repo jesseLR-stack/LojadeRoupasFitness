@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useStore } from "./StoreProvider";
-import { BagIcon, HeartIcon, SearchIcon } from "./icons";
+import { BagIcon, HeartIcon, SearchIcon, UserIcon } from "./icons";
 
 export default function Header() {
   const { cart, favs, openCart, bump } = useStore();
@@ -33,6 +33,7 @@ export default function Header() {
           <Link href="/?genero=feminino#loja">Feminino</Link>
           <Link href="/?genero=masculino#loja">Masculino</Link>
           <Link href="/#colecoes">Coleções</Link>
+          <Link href="/sobre">Sobre</Link>
         </nav>
         <div className="header-actions">
           <Link className="icon-btn" href="/?busca=1#loja" aria-label="Buscar"><SearchIcon /></Link>
@@ -40,6 +41,7 @@ export default function Header() {
             <HeartIcon />
             <span className={`cart-count ${favs.length ? "show" : ""}`}>{favs.length}</span>
           </Link>
+          <Link className="icon-btn" href="/conta" aria-label="Minha conta e pedidos"><UserIcon /></Link>
           <button key={bump} className={`icon-btn cart-btn ${bump ? "bump" : ""}`} onClick={openCart} aria-label="Abrir sacola">
             <BagIcon />
             <span className={`cart-count ${count ? "show" : ""}`}>{count}</span>

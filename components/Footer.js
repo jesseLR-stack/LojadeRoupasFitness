@@ -11,14 +11,15 @@ export default function Footer() {
         <p>Moda fitness de alta performance.</p>
       </div>
       <div>
-        <h4>Loja</h4>
+        <h2 className="footer-title">Loja</h2>
         <Link href="/?genero=feminino#loja">Feminino</Link>
         <Link href="/?genero=masculino#loja">Masculino</Link>
         <Link href="/#colecoes">Coleções</Link>
+        <Link href="/sobre">Sobre nós</Link>
         <SizeGuide className="footer-link" />
       </div>
       <div>
-        <h4>Ajuda</h4>
+        <h2 className="footer-title">Ajuda</h2>
         <Link href="/trocas-e-devolucoes">Trocas e devoluções</Link>
         <Link href="/entrega">Entrega e frete</Link>
         <Link href="/privacidade">Privacidade</Link>

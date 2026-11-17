@@ -4,7 +4,8 @@ import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { SESSION_COOKIE, SESSION_HOURS, adminPassword, checkPassword, createSessionToken, verifySessionToken } from "@/lib/auth";
-import { MAX_IMAGES, db, missingSeedProducts, normalizeProductInput } from "@/lib/db";
+import { normalizeCouponInput } from "@/lib/coupons";
+import { MAX_IMAGES, db, missingSeedProducts, normalizeProductInput, refreshProductRating } from "@/lib/db";
 import { ORDER_STATUSES } from "@/lib/orders";
 
 async function requireAdmin() {
@@ -84,7 +85,7 @@ export async function setOrderStatus(formData) {
   const status = formData.get("status");
   if (!ORDER_STATUSES[status]) return;
   await db.updateOrderStatus(String(formData.get("number")), status);
-  revalidatePath("/admin");
+  revalidatePath("/admin", "layout");
 }
 
 // ---------- Fotos dos produtos ----------
@@ -141,4 +142,44 @@ export async function makeMainImage(formData) {
   await db.setProductImages(product.id, images);
   refreshStore();
   return { images };
+}
+
+// ---------- Cupons ----------
+
+export async function saveCouponAction(_prev, formData) {
+  await requireAdmin();
+  const input = Object.fromEntries(formData);
+  const { coupon, errors } = normalizeCouponInput(input);
+  if (Object.keys(errors).length) return { errors, values: input };
+  const editing = formData.get("original");
+  if (!editing && (await db.getCoupon(coupon.code))) {
+    return { errors: { code: "Já existe um cupom com esse código" }, values: input };
+  }
+  if (editing && editing !== coupon.code) await db.deleteCoupon(editing); // renomeou o código
+  await db.saveCoupon(coupon);
+  revalidatePath("/admin/cupons");
+  redirect("/admin/cupons?salvo=1");
+}
+
+export async function toggleCoupon(formData) {
+  await requireAdmin();
+  const c = await db.getCoupon(String(formData.get("code")));
+  if (c) await db.saveCoupon({ code: c.code, percent: c.percent, active: !c.active, expires_at: c.expires_at, max_uses: c.max_uses });
+  revalidatePath("/admin/cupons");
+}
+
+export async function deleteCouponAction(formData) {
+  await requireAdmin();
+  await db.deleteCoupon(String(formData.get("code")));
+  revalidatePath("/admin/cupons");
+}
+
+// ---------- Avaliações ----------
+
+export async function deleteReviewAction(formData) {
+  await requireAdmin();
+  const removed = await db.deleteReview(Number(formData.get("id")));
+  if (removed) await refreshProductRating(removed.product_id);
+  refreshStore();
+  revalidatePath("/admin/avaliacoes");
 }

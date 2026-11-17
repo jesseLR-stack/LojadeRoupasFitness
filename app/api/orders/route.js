@@ -3,7 +3,9 @@
 import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 import { OutOfStockError, db } from "@/lib/db";
-import { COUPONS, MAX_INSTALLMENTS, PAY_OPTIONS, SHIP_OPTIONS, cartTotals } from "@/lib/pricing";
+import { currentCustomer } from "@/lib/session";
+import { couponProblem, normalizeCode } from "@/lib/coupons";
+import { MAX_INSTALLMENTS, PAY_OPTIONS, SHIP_OPTIONS, cartTotals } from "@/lib/pricing";
 import { STEP_FIELDS, validate } from "@/lib/validation";
 
 const MAX_QTY = 20;
@@ -31,15 +33,26 @@ export async function POST(request) {
   }
   if (!SHIP_OPTIONS[ship]) return bad("Forma de envio inválida");
   if (!PAY_OPTIONS[pay]) return bad("Forma de pagamento inválida");
-  if (coupon !== null && !COUPONS[coupon]) return bad("Cupom inválido");
+  let couponObj = null;
+  if (coupon) {
+    const c = await db.getCoupon(normalizeCode(coupon)).catch(() => null);
+    const problem = couponProblem(c);
+    if (problem) return bad(`${problem}. Remova o cupom da sacola e tente de novo.`, 409);
+    couponObj = { code: c.code, percent: c.percent };
+  }
   if (!Number.isInteger(installments) || installments < 1 || installments > MAX_INSTALLMENTS) return bad("Parcelamento inválido");
 
   const errors = validate([...STEP_FIELDS[1], ...STEP_FIELDS[2]], customer);
   if (Object.keys(errors).length) return NextResponse.json({ error: "Confira seus dados", fields: errors }, { status: 422 });
 
   const cart = items.map(({ id, color, size, qty }) => ({ key: `${id}-${color}-${size}`, id, color, size, qty }));
-  const t = cartTotals(cart, coupon, { ship, pay }, catalog);
+  const t = cartTotals(cart, couponObj, { ship, pay }, catalog);
   const number = "NF" + Date.now().toString().slice(-6) + Math.floor(Math.random() * 10);
+
+  // Conta o uso do cupom (falha se outro pedido usou o último uso disponível).
+  if (couponObj && !(await db.useCoupon(couponObj.code))) {
+    return bad("Este cupom atingiu o limite de usos. Remova o cupom da sacola e tente de novo.", 409);
+  }
 
   // Baixa o estoque de todos os itens de uma vez; se faltar algum, nada é baixado.
   try {
@@ -54,14 +67,16 @@ export async function POST(request) {
 
   // TODO (próxima etapa): criar a cobrança no Mercado Pago.
   const { nome, email, tel, cpf, cep, rua, numero: num, compl, bairro, cidade, uf } = customer;
+  const customerAccount = await currentCustomer();
   await db.createOrder({
     number,
+    ...(customerAccount && { customer_id: customerAccount.id }),
     status: "novo",
     customer: { nome, email, tel, cpf, cep, rua, numero: num, compl: compl ?? "", bairro, cidade, uf },
     items: t.lines.map((l) => ({ id: l.id, name: l.product.name, color: l.color, size: l.size, qty: l.qty, price: l.product.price })),
     ship, pay,
     installments: pay === "card" ? installments : 1,
-    coupon,
+    coupon: couponObj?.code ?? null,
     subtotal: t.subtotal, discount: t.discount, pix_discount: t.pix, shipping: t.shipping, total: t.total,
   });
   revalidatePath("/", "layout"); // atualiza o estoque mostrado na loja
