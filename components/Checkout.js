@@ -212,6 +212,13 @@ export default function Checkout() {
             </>
           )}
 
+          {step === 3 && (
+            <p className="consent">
+              Ao confirmar, você concorda com os <Link href="/termos" target="_blank">Termos de uso</Link> e
+              a <Link href="/privacidade" target="_blank">Política de privacidade</Link>, e conhece as regras de{" "}
+              <Link href="/trocas-e-devolucoes" target="_blank">trocas e devoluções</Link>.
+            </p>
+          )}
           <div className="ck-actions">
             {step > 1 ? <button type="button" className="btn btn-ghost" onClick={() => setStep(step - 1)}>Voltar</button> : <Link href="/" className="btn btn-ghost">Continuar comprando</Link>}
             <button type="submit" className="btn btn-primary" disabled={sending}>

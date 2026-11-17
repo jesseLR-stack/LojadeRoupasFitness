@@ -7,6 +7,9 @@ export default async function sitemap() {
   const products = await db.listProducts();
   return [
     { url: SITE_URL, changeFrequency: "daily", priority: 1 },
+    ...["trocas-e-devolucoes", "entrega", "privacidade", "termos", "contato"].map((p) => ({
+      url: `${SITE_URL}/${p}`, changeFrequency: "monthly", priority: 0.3,
+    })),
     ...products.map((p) => ({ url: `${SITE_URL}/produto/${p.slug}`, changeFrequency: "weekly", priority: 0.8 })),
   ];
 }

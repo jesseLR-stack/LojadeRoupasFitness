@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { COLORS, categoryLabel } from "@/lib/products";
 import { PIX_DISCOUNT, brl } from "@/lib/pricing";
@@ -94,7 +95,7 @@ export default function ProductView({ product: p }) {
         {!soldOut && p.stock <= 5 && <p className="low-stock">Corra! Só restam {p.stock} unidade(s).</p>}
         <ul className="perks">
           <li>✓ Tecido Dry‑Fit antissuor</li>
-          <li>✓ Troca grátis em 30 dias</li>
+          <li>✓ <Link href="/trocas-e-devolucoes">Troca grátis em 30 dias</Link></li>
           <li>✓ Envio em até 24h úteis</li>
         </ul>
       </div>
