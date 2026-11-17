@@ -28,14 +28,12 @@ export default function ContactPage() {
             </a>
           )}
         </div>
-      ) : (
-        <p className="policy-intro">Nossos canais de atendimento estão sendo configurados. Volte em breve.</p>
-      )}
+      ) : null}
       <p>Horário de atendimento: {STORE.hours}.</p>
 
       <h2>Para agilizar</h2>
       <ul>
-        <li>Tenha em mãos o <b>número do pedido</b> (começa com &quot;NF&quot; e está no e-mail de confirmação).</li>
+        <li>Tenha em mãos o <b>número do pedido</b> (começa com &quot;NF&quot; e aparece na tela de confirmação da compra).</li>
         <li>Para trocas e defeitos, se puder, envie uma foto da peça e da etiqueta.</li>
         <li>Veja também as regras de <Link href="/trocas-e-devolucoes">trocas e devoluções</Link> e de <Link href="/entrega">entrega</Link>.</li>
       </ul>
