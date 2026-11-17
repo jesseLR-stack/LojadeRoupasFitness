@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { COLORS } from "@/lib/products";
+import { colorOf } from "@/lib/colors";
 import { FREE_SHIPPING, brl, cartTotals } from "@/lib/pricing";
 import ProductImage from "./ProductImage";
 import { useStore } from "./StoreProvider";
@@ -52,7 +52,7 @@ export default function CartDrawer() {
               </Link>
               <div className="ci-info">
                 <p className="ci-name">{l.product.name}</p>
-                <p className="ci-meta">{COLORS[l.color].name} · {l.size}</p>
+                <p className="ci-meta">{colorOf(l.color).name} · {l.size}</p>
                 <div className="qty">
                   <button onClick={() => changeQty(l.key, -1)} aria-label="Diminuir">−</button>
                   <span>{l.qty}</span>

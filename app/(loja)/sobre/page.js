@@ -27,7 +27,7 @@ export default function AboutPage() {
           </p>
         </div>
         <div className="about-art" aria-hidden="true">
-          <div data-bg="lima"><ProductArt product={SEED_PRODUCTS[1]} color="lima" /></div>
+          <div data-bg="verde-limao"><ProductArt product={SEED_PRODUCTS[1]} color="verde-limao" /></div>
           <div data-bg="vinho"><ProductArt product={SEED_PRODUCTS[0]} color="vinho" /></div>
         </div>
       </section>

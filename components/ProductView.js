@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { COLORS, categoryLabel } from "@/lib/products";
+import { colorOf } from "@/lib/colors";
+import { categoryLabel } from "@/lib/products";
 import { PIX_DISCOUNT, brl } from "@/lib/pricing";
 import ProductImage from "./ProductImage";
 import SizeGuide from "./SizeGuide";
@@ -56,15 +57,15 @@ export default function ProductView({ product: p }) {
         </p>
         <p className="desc">{p.description}</p>
 
-        <p className="opt-label">Cor: <b>{COLORS[color].name}</b></p>
+        <p className="opt-label">Cor: <b>{colorOf(color).name}</b></p>
         <div className="color-opts">
           {p.colors.map((c) => (
             <button
               key={c}
               className={`color-opt ${c === color ? "active" : ""}`}
-              style={{ "--sw": COLORS[c].hex }}
+              style={{ "--sw": colorOf(c).hex }}
               onClick={() => setColor(c)}
-              aria-label={COLORS[c].name}
+              aria-label={colorOf(c).name}
               aria-pressed={c === color}
             />
           ))}

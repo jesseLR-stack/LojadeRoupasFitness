@@ -37,7 +37,7 @@ export default function HomePage() {
         <div className="hero-visual" aria-hidden="true">
           <div className="blob" />
           <div className="hero-card hero-card-1" data-bg="vinho"><ProductArt product={SEED_PRODUCTS[0]} color="vinho" /></div>
-          <div className="hero-card hero-card-2" data-bg="lima"><ProductArt product={SEED_PRODUCTS[1]} color="lima" /></div>
+          <div className="hero-card hero-card-2" data-bg="verde-limao"><ProductArt product={SEED_PRODUCTS[1]} color="verde-limao" /></div>
           <div className="badge-spin">
             <svg viewBox="0 0 100 100">
               <defs><path id="circ" d="M50 50m-38 0a38 38 0 1 1 76 0a38 38 0 1 1 -76 0" /></defs>

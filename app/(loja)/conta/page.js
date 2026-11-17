@@ -4,7 +4,7 @@ import ProductImage from "@/components/ProductImage";
 import { db } from "@/lib/db";
 import { ORDER_STATUSES } from "@/lib/orders";
 import { PAY_OPTIONS, SHIP_OPTIONS, brl } from "@/lib/pricing";
-import { COLORS } from "@/lib/products";
+import { colorOf } from "@/lib/colors";
 import { currentCustomer } from "@/lib/session";
 import { logout } from "./actions";
 import ReviewForm from "./ReviewForm";
@@ -90,7 +90,7 @@ export default async function AccountPage() {
                       </div>
                       <div className="ol-info">
                         {p?.active ? <Link href={`/produto/${p.slug}`}>{i.name}</Link> : <span>{i.name}</span>}
-                        <small className="muted">{i.qty}× · {COLORS[i.color]?.name ?? i.color} · {i.size} · {brl(i.price)}</small>
+                        <small className="muted">{i.qty}× · {colorOf(i.color).name} · {i.size} · {brl(i.price)}</small>
                         {o.status === "entregue" && p && (
                           <ReviewForm productId={i.id} orderNumber={o.number} existing={reviewByProduct.get(i.id) ?? null} />
                         )}

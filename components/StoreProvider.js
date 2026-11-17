@@ -1,5 +1,6 @@
 "use client";
 
+import { normalizeColor } from "@/lib/colors";
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 
 const StoreContext = createContext(null);
@@ -23,7 +24,11 @@ export function StoreProvider({ children, catalog = [] }) {
   const toastTimer = useRef();
 
   useEffect(() => {
-    setCart(read(KEYS.cart, []));
+    // Sacolas salvas antes da troca de paleta: converte as cores antigas.
+    setCart(read(KEYS.cart, []).map((i) => {
+      const color = normalizeColor(i.color);
+      return { ...i, color, key: `${i.id}-${color}-${i.size}` };
+    }));
     setFavs(read(KEYS.favs, []));
     const saved = read(KEYS.coupon, null);
     setCoupon(saved?.code && saved?.percent ? saved : null); // formato antigo (texto) é descartado

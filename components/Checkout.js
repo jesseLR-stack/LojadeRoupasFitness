@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRef, useState } from "react";
-import { COLORS } from "@/lib/products";
+import { colorOf } from "@/lib/colors";
 import { MAX_INSTALLMENTS, PAY_OPTIONS, SHIP_OPTIONS, brl, cartTotals } from "@/lib/pricing";
 import { MASKS, RULES, STEP_FIELDS, validate } from "@/lib/validation";
 import ProductImage from "./ProductImage";
@@ -238,7 +238,7 @@ export default function Checkout({ customer = null }) {
           {t.lines.map((l) => (
             <li key={l.key}>
               <div className={`thumb sm ${l.product.images?.length ? "has-photo" : ""}`} data-bg={l.color}><ProductImage product={l.product} color={l.color} /><span className="q">{l.qty}</span></div>
-              <div><p>{l.product.name}</p><small>{COLORS[l.color].name} · {l.size}</small></div>
+              <div><p>{l.product.name}</p><small>{colorOf(l.color).name} · {l.size}</small></div>
               <strong>{brl(l.product.price * l.qty)}</strong>
             </li>
           ))}
