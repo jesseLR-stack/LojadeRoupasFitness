@@ -8,7 +8,7 @@ function Err({ msg }) {
   return msg ? <small className="err">{msg}</small> : null;
 }
 
-export function LoginForm({ next }) {
+export function LoginForm({ next, motivo }) {
   const [state, action, pending] = useActionState(login, null);
   return (
     <form action={action} className="auth-form">
@@ -23,12 +23,12 @@ export function LoginForm({ next }) {
       </label>
       {state?.error && <p className="form-error" role="alert">{state.error}</p>}
       <button className="btn btn-primary full" disabled={pending}>{pending ? "Entrando…" : "Entrar"}</button>
-      <p className="muted small">Ainda não tem conta? <Link href={`/conta/cadastro?next=${encodeURIComponent(next)}`}>Criar conta</Link></p>
+      <p className="muted small">Ainda não tem conta? <Link href={`/conta/cadastro?next=${encodeURIComponent(next)}${motivo ? `&motivo=${motivo}` : ""}`}>Criar conta</Link></p>
     </form>
   );
 }
 
-export function SignupForm({ next }) {
+export function SignupForm({ next, motivo }) {
   const [state, action, pending] = useActionState(signup, null);
   const e = state?.errors ?? {};
   return (
@@ -51,7 +51,7 @@ export function SignupForm({ next }) {
       </label>
       {e.form && <p className="form-error" role="alert">{e.form}</p>}
       <button className="btn btn-primary full" disabled={pending}>{pending ? "Criando…" : "Criar conta"}</button>
-      <p className="muted small">Já tem conta? <Link href={`/conta/entrar?next=${encodeURIComponent(next)}`}>Entrar</Link></p>
+      <p className="muted small">Já tem conta? <Link href={`/conta/entrar?next=${encodeURIComponent(next)}${motivo ? `&motivo=${motivo}` : ""}`}>Entrar</Link></p>
     </form>
   );
 }

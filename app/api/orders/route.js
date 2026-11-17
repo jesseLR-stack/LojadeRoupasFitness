@@ -23,6 +23,8 @@ export async function POST(request) {
   }
   const { items, coupon = null, ship, pay, installments = 1, customer = {} } = body ?? {};
 
+  const customerAccount = await currentCustomer();
+  if (!customerAccount) return bad("Entre na sua conta para finalizar a compra.", 401);
   if (!Array.isArray(items) || items.length === 0) return bad("A sacola está vazia");
   const catalog = await db.listProducts();
   for (const i of items) {
@@ -67,10 +69,9 @@ export async function POST(request) {
 
   // TODO (próxima etapa): criar a cobrança no Mercado Pago.
   const { nome, email, tel, cpf, cep, rua, numero: num, compl, bairro, cidade, uf } = customer;
-  const customerAccount = await currentCustomer();
   await db.createOrder({
     number,
-    ...(customerAccount && { customer_id: customerAccount.id }),
+    customer_id: customerAccount.id,
     status: "novo",
     customer: { nome, email, tel, cpf, cep, rua, numero: num, compl: compl ?? "", bairro, cidade, uf },
     items: t.lines.map((l) => ({ id: l.id, name: l.product.name, color: l.color, size: l.size, qty: l.qty, price: l.product.price })),

@@ -23,6 +23,13 @@ export default function TermsPage() {
         7.962/2013, sobre comércio eletrônico.
       </p>
 
+      <h2>Conta na loja</h2>
+      <ul>
+        <li>Qualquer pessoa pode navegar e ver os produtos. Para comprar, é preciso ter uma conta, criada com nome, e-mail e senha.</li>
+        <li>A conta permite acompanhar o andamento dos pedidos e avaliar os produtos recebidos.</li>
+        <li>Mantenha sua senha em segredo. Compras feitas com a sua conta são consideradas suas.</li>
+      </ul>
+
       <h2>Produtos, fotos e tamanhos</h2>
       <ul>
         <li>Fazemos o possível para que fotos e cores sejam fiéis, mas a cor pode variar um pouco conforme a tela do seu aparelho.</li>

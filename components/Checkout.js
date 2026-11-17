@@ -138,13 +138,8 @@ export default function Checkout({ customer = null }) {
           {step === 1 && (
             <>
               <h2 className="step-title">Seus dados</h2>
-              {customer ? (
+              {customer && (
                 <p className="account-note">Comprando como <b>{customer.email}</b>. O pedido vai aparecer em <Link href="/conta">Meus pedidos</Link>.</p>
-              ) : (
-                <p className="account-note">
-                  Tem conta? <Link href="/conta/entrar?next=/checkout">Entre</Link> para acompanhar o pedido. Ou{" "}
-                  <Link href="/conta/cadastro?next=/checkout">crie uma conta</Link> em segundos. Também dá para comprar sem conta.
-                </p>
               )}
               <div className="form-grid">
                 <Field name="nome" label="Nome completo" full autoComplete="name" {...fieldProps} />

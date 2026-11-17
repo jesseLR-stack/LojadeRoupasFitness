@@ -90,6 +90,7 @@ export default function CartDrawer() {
           >
             Finalizar compra
           </button>
+          <p className="cart-hint">Para comprar, você entra ou cria uma conta na próxima tela. Sua sacola fica guardada.</p>
         </div>
       </aside>
     </>

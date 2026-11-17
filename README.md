@@ -32,7 +32,7 @@ Outros comandos:
 | `/?genero=feminino#loja` | Loja já filtrada (também `modalidade=corrida`, `favoritos=1`) |
 | `/produto/<nome-do-produto>` | Página própria de cada produto |
 | `/checkout` | Finalizar compra em 3 etapas |
-| `/conta` | Conta do cliente: cadastro, login, "Meus pedidos" com o andamento e avaliação dos produtos recebidos |
+| `/conta` | Conta do cliente: cadastro, login, "Meus pedidos" com o andamento e avaliação dos produtos recebidos. **Comprar exige conta**; navegar é livre |
 | `/sobre` | Sobre a marca |
 | `/admin` | Painel (com senha): visão geral com gráficos, pedidos, produtos, cupons e avaliações |
 | `/trocas-e-devolucoes`, `/entrega`, `/privacidade`, `/termos`, `/contato` | Políticas da loja e atendimento |
