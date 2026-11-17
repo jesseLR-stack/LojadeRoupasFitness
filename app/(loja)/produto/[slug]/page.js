@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import ProductCard from "@/components/ProductCard";
 import ProductView from "@/components/ProductView";
+import ReviewsSection from "@/components/ReviewsSection";
 import { db } from "@/lib/db";
 import { categoryLabel, relatedProducts } from "@/lib/products";
 import { SITE_URL } from "@/lib/site";
@@ -30,6 +31,7 @@ export default async function ProductPage({ params }) {
   const product = await db.getProduct({ slug });
   if (!product || !product.active) notFound();
   const related = relatedProducts(product, await db.listProducts());
+  const reviews = await db.listReviews({ productId: product.id }).catch(() => []); // antes do script 003 a tabela não existe
 
   // Dados estruturados: ajudam o Google a mostrar preço e avaliação nos resultados.
   const jsonLd = {
@@ -64,6 +66,8 @@ export default async function ProductPage({ params }) {
       </nav>
 
       <ProductView product={product} />
+
+      <ReviewsSection product={product} reviews={reviews} />
 
       <section className="related-section">
         <h2 className="section-title">Combina com</h2>

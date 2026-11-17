@@ -14,6 +14,7 @@ Deixadas para depois da apresentação da faculdade. Nada disso impede o site de
 - [ ] Tirar o aviso "Ambiente de demonstração" do checkout depois da integração
 - [ ] Frete real pelo CEP (Melhor Envio)
 - [ ] E-mails automáticos de confirmação de pedido (ex.: Resend)
+- [ ] "Esqueci minha senha" na conta do cliente (precisa do envio de e-mails)
 - [ ] Domínio próprio (ex.: newfitness.com.br, no Registro.br)
 
 ## Conteúdo

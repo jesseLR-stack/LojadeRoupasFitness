@@ -1,7 +1,6 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
-import { COUPONS } from "@/lib/pricing";
 
 const StoreContext = createContext(null);
 const KEYS = { cart: "newfitness-cart", favs: "newfitness-favs", coupon: "newfitness-coupon" };
@@ -26,7 +25,8 @@ export function StoreProvider({ children, catalog = [] }) {
   useEffect(() => {
     setCart(read(KEYS.cart, []));
     setFavs(read(KEYS.favs, []));
-    setCoupon(read(KEYS.coupon, null));
+    const saved = read(KEYS.coupon, null);
+    setCoupon(saved?.code && saved?.percent ? saved : null); // formato antigo (texto) é descartado
     setReady(true);
   }, []);
 
@@ -82,17 +82,28 @@ export function StoreProvider({ children, catalog = [] }) {
     });
   }, [toast]);
 
-  const applyCoupon = useCallback((code) => {
-    const c = code.trim().toUpperCase();
-    if (!COUPONS[c]) { toast("Cupom inválido"); return false; }
-    setCoupon(c);
-    toast(`Cupom ${c} aplicado: ${COUPONS[c] * 100}% OFF`);
-    return true;
+  // O cupom é conferido no servidor (ativo, validade, limite de usos).
+  const applyCoupon = useCallback(async (code) => {
+    try {
+      const res = await fetch("/api/coupons", {
+        method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ code }),
+      });
+      const data = await res.json();
+      if (!res.ok) { toast(data.error || "Cupom inválido"); return false; }
+      setCoupon(data.coupon);
+      toast(`Cupom ${data.coupon.code} aplicado: ${data.coupon.percent}% OFF`);
+      return true;
+    } catch {
+      toast("Não foi possível conferir o cupom. Tente de novo.");
+      return false;
+    }
   }, [toast]);
+
+  const removeCoupon = useCallback(() => setCoupon(null), []);
 
   const value = {
     ready, catalog, cart, favs, coupon, cartOpen, bump,
-    addToCart, changeQty, removeItem, clearCart, toggleFav, applyCoupon, toast,
+    addToCart, changeQty, removeItem, clearCart, toggleFav, applyCoupon, removeCoupon, setCoupon, toast,
     openCart: () => setCartOpen(true),
     closeCart: () => setCartOpen(false),
   };

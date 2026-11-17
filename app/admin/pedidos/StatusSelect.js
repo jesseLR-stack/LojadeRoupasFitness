@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import { setOrderStatus } from "./actions";
+import { setOrderStatus } from "../actions";
 
 // Muda o status do pedido assim que a opção é escolhida.
 export default function StatusSelect({ number, status, statuses }) {

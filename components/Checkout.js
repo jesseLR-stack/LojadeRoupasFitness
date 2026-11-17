@@ -28,10 +28,10 @@ function Field({ name, label, data, errors, onChange, full, ...props }) {
   );
 }
 
-export default function Checkout() {
+export default function Checkout({ customer = null }) {
   const { ready, catalog, cart, coupon, clearCart, toast } = useStore();
   const [step, setStep] = useState(1);
-  const [data, setData] = useState({});
+  const [data, setData] = useState(customer ? { nome: customer.name, email: customer.email } : {});
   const [errors, setErrors] = useState({});
   const [ship, setShip] = useState("pac");
   const [pay, setPay] = useState("pix");
@@ -91,7 +91,7 @@ export default function Checkout() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           items: cart.map(({ id, color, size, qty }) => ({ id, color, size, qty })),
-          coupon, ship, pay, installments: pay === "card" ? installments : 1, customer,
+          coupon: coupon?.code ?? null, ship, pay, installments: pay === "card" ? installments : 1, customer,
         }),
       });
       const json = await res.json();
@@ -125,6 +125,7 @@ export default function Checkout() {
   return (
     <div className="checkout-page">
       <div className="ck-main">
+        <h1 className="sr-only">Finalizar compra</h1>
         <ol className="stepper">
           {STEPS.map((s, i) => (
             <li key={s} className={i + 1 === step ? "current" : i + 1 < step ? "done" : ""}>
@@ -136,7 +137,15 @@ export default function Checkout() {
         <form ref={formRef} onSubmit={submit} noValidate>
           {step === 1 && (
             <>
-              <h3>Seus dados</h3>
+              <h2 className="step-title">Seus dados</h2>
+              {customer ? (
+                <p className="account-note">Comprando como <b>{customer.email}</b>. O pedido vai aparecer em <Link href="/conta">Meus pedidos</Link>.</p>
+              ) : (
+                <p className="account-note">
+                  Tem conta? <Link href="/conta/entrar?next=/checkout">Entre</Link> para acompanhar o pedido. Ou{" "}
+                  <Link href="/conta/cadastro?next=/checkout">crie uma conta</Link> em segundos. Também dá para comprar sem conta.
+                </p>
+              )}
               <div className="form-grid">
                 <Field name="nome" label="Nome completo" full autoComplete="name" {...fieldProps} />
                 <Field name="email" label="E-mail" type="email" autoComplete="email" placeholder="voce@email.com" {...fieldProps} />
@@ -148,7 +157,7 @@ export default function Checkout() {
 
           {step === 2 && (
             <>
-              <h3>Entrega</h3>
+              <h2 className="step-title">Entrega</h2>
               <div className="form-grid">
                 <Field name="cep" label="CEP" inputMode="numeric" autoComplete="postal-code" placeholder="00000-000" {...fieldProps} />
                 <p className="cep-hint">{cepHint}</p>
@@ -177,7 +186,7 @@ export default function Checkout() {
 
           {step === 3 && (
             <>
-              <h3>Pagamento</h3>
+              <h2 className="step-title">Pagamento</h2>
               <div className="pay-tabs" role="tablist">
                 {Object.entries(PAY_OPTIONS).map(([k, o]) => (
                   <button key={k} type="button" role="tab" aria-selected={pay === k}
@@ -229,7 +238,7 @@ export default function Checkout() {
       </div>
 
       <aside className="ck-summary">
-        <h4>Resumo do pedido</h4>
+        <h2 className="sum-title">Resumo do pedido</h2>
         <ul className="sum-items">
           {t.lines.map((l) => (
             <li key={l.key}>
@@ -241,7 +250,7 @@ export default function Checkout() {
         </ul>
         <dl className="totals">
           <div><dt>Subtotal</dt><dd>{brl(t.subtotal)}</dd></div>
-          {t.discount > 0 && <div className="disc"><dt>Cupom {coupon}</dt><dd>− {brl(t.discount)}</dd></div>}
+          {t.discount > 0 && <div className="disc"><dt>Cupom {coupon.code}</dt><dd>− {brl(t.discount)}</dd></div>}
           {t.pix > 0 && <div className="disc"><dt>Desconto Pix</dt><dd>− {brl(t.pix)}</dd></div>}
           <div><dt>Frete{step >= 2 ? ` · ${SHIP_OPTIONS[ship].label}` : ""}</dt><dd>{t.shipping ? brl(t.shipping) : "Grátis"}</dd></div>
           <div className="grand"><dt>Total</dt><dd>{brl(t.total)}</dd></div>

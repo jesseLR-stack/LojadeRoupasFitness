@@ -15,8 +15,11 @@ export default async function AdminLayout({ children }) {
         <Link href="/admin" className="logo">New<span>Fitness</span> <small>painel</small></Link>
         {logged && (
           <nav>
-            <Link href="/admin">Pedidos</Link>
+            <Link href="/admin">Visão geral</Link>
+            <Link href="/admin/pedidos">Pedidos</Link>
             <Link href="/admin/produtos">Produtos</Link>
+            <Link href="/admin/cupons">Cupons</Link>
+            <Link href="/admin/avaliacoes">Avaliações</Link>
             <Link href="/" target="_blank">Ver loja ↗</Link>
             <form action={logout}><button type="submit">Sair</button></form>
           </nav>

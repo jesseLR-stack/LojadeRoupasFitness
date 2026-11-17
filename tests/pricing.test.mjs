@@ -22,7 +22,7 @@ test("abaixo de R$ 299 cobra frete PAC", () => {
 });
 
 test("frete grátis considera o valor já com cupom", () => {
-  const t = cartTotals([jaqueta], "NEW10", {}, CATALOG); // 299,90 - 10% = 269,91
+  const t = cartTotals([jaqueta], { code: "NEW10", percent: 10 }, {}, CATALOG); // 299,90 - 10% = 269,91
   assert.ok(t.base < FREE_SHIPPING);
   assert.equal(t.shipping, SHIPPING_COST);
   assert.equal(cartTotals([jaqueta], null, {}, CATALOG).shipping, 0);
@@ -36,7 +36,7 @@ test("Pix dá 5% sobre os produtos, não sobre o frete", () => {
 });
 
 test("cupom inválido é ignorado e produto inexistente some", () => {
-  const t = cartTotals([legging, { key: "x", id: 999, color: "preto", size: "M", qty: 1 }], "FAKE", {}, CATALOG);
+  const t = cartTotals([legging, { key: "x", id: 999, color: "preto", size: "M", qty: 1 }], { code: "FAKE" }, {}, CATALOG);
   assert.equal(t.discount, 0);
   assert.equal(t.lines.length, 1);
 });
